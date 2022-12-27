@@ -1,6 +1,21 @@
 cmake_minimum_required(VERSION 3.14)
 
+# Add project_options v0.20.0
+# https://github.com/cpp-best-practices/project_options
+include(FetchContent)
+FetchContent_Declare(_project_options URL https://github.com/aminya/project_options/archive/refs/tags/v0.20.0.zip)
+FetchContent_MakeAvailable(_project_options)
+include(${_project_options_SOURCE_DIR}/Index.cmake)
+
 project(text_processing VERSION 0.2 LANGUAGES CXX)
+
+project_options(
+    ENABLE_CPPCHECK
+    ENABLE_CLANG_TIDY
+    ENABLE_SANITIZER_ADDRESS
+    ENABLE_SANITIZER_LEAK
+    ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
+)
 
 add_library(text_processing INTERFACE 
     include/text_processing/common.hpp
@@ -45,12 +60,7 @@ if(TEXT_PROCESSING_ENABLE_TESTS)
 	split.cc 
 	sub.cc
     )
-    if(TEXT_PROCESSING_ENABLE_TESTS_SANITIZERS)
-	if(NOT MSVC)
-	    target_compile_options(main PRIVATE -fno-omit-frame-pointer -fsanitize=address,leak,undefined)
-	    target_link_options(main PRIVATE -fno-omit-frame-pointer -fsanitize=address,leak,undefined)
-	endif()
-    endif()
-    target_link_libraries(main PUBLIC text_processing gtest_main)
+
+    target_link_libraries(main PRIVATE text_processing gtest_main project_options project_warnings)
     gtest_discover_tests(main)
 endif()

@@ -32,12 +32,12 @@ struct remove_all_const<T* const>
 };
 
 template <typename T>
-using remove_all_const_t = remove_all_const<T>::type;
+using remove_all_const_t = typename remove_all_const<T>::type;
 
 template <typename E>
 struct container_type_detail
 {
-    using value_type = E::value_type;
+    using value_type = typename E::value_type;
 };
 
 template <>
@@ -68,7 +68,7 @@ template <typename T>
 using container_type = container_type_detail<remove_all_const_t<std::decay_t<T>>>;
 
 template <typename T>
-using container_type_t = container_type_detail<remove_all_const_t<std::decay_t<T>>>::value_type;
+using container_type_t = typename container_type_detail<remove_all_const_t<std::decay_t<T>>>::value_type;
 
 template <typename E>
 constexpr std::size_t strlen(const E* start)
@@ -122,22 +122,22 @@ struct Text
     using value_type = E;
     const E* ptr = nullptr;
     size_t length = 0;
-    constexpr Text(const std::basic_string<E>& str)
+    explicit constexpr Text(const std::basic_string<E>& str)
     {
         ptr = str.data();
         length = str.size();
     }
-    constexpr Text(std::basic_string_view<E> str)
+    explicit constexpr Text(std::basic_string_view<E> str)
     {
         ptr = str.data();
         length = str.size();
     }
-    constexpr Text(const std::vector<E>& str)
+    explicit constexpr Text(const std::vector<E>& str)
     {
         ptr = str.data();
         length = str.size();
     }
-    constexpr Text(const E* str)
+    explicit constexpr Text(const E* str)
     {
         ptr = str;
         length = strlen(str);
@@ -147,48 +147,47 @@ struct Text
 template <typename E>
 struct Delimiter
 {
+    E elem = {};
     const E* ptr = nullptr;
     size_t length = 0;
-    E elem = {};
-    constexpr Delimiter(const std::basic_string<E>& str)
+    explicit constexpr Delimiter(const std::basic_string<E>& str)
     {
         ptr = str.data();
         length = str.size();
     }
-    constexpr Delimiter(std::basic_string_view<E> str)
+    explicit constexpr Delimiter(std::basic_string_view<E> str)
     {
         ptr = str.data();
         length = str.size();
     }
-    constexpr Delimiter(const std::vector<E>& str)
+    explicit constexpr Delimiter(const std::vector<E>& str)
     {
         ptr = str.data();
         length = str.size();
     }
-    constexpr Delimiter(const E* str)
+    explicit constexpr Delimiter(const E* str)
     {
         ptr = str;
         length = strlen(str);
     }
-    constexpr Delimiter(E str)
-    {
-        elem = str;
-        ptr = &elem;
-        length = 1;
-    }
+    explicit constexpr Delimiter(E str)
+        : elem(str)
+        , ptr(&elem)
+        , length(1)
+    {}
 };
 
 template <typename E>
 struct Delimiters
 {
     std::set<E> delimiters;
-    constexpr Delimiters(const std::basic_string<E>& str)
+    explicit constexpr Delimiters(const std::basic_string<E>& str)
         : delimiters{str.cbegin(), str.cend()}
     {}
-    constexpr Delimiters(std::basic_string_view<E> str)
+    explicit constexpr Delimiters(std::basic_string_view<E> str)
         : delimiters{str.cbegin(), str.cend()}
     {}
-    constexpr Delimiters(const E* str)
+    explicit constexpr Delimiters(const E* str)
         : delimiters{str, str + strlen(str)}
     {}
 
