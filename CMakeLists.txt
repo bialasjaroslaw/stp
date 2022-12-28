@@ -9,7 +9,7 @@ include(${_project_options_SOURCE_DIR}/Index.cmake)
 
 project(text_processing VERSION 0.2 LANGUAGES CXX)
 option(ENABLE_DEVELOPER_MODE "Enable developer mode" OFF)
-option(TEXT_PROCESSING_ENABLE_TESTING "Enable test build" ON)
+option(TEXT_PROCESSING_ENABLE_TESTS "Enable test build" ON)
 
 include(${_project_options_SOURCE_DIR}/src/DynamicProjectOptions.cmake)
 dynamic_project_options(
@@ -34,7 +34,8 @@ add_library(text_processing INTERFACE
 )
 target_include_directories(text_processing INTERFACE include/text_processing)
 
-if (TEXT_PROCESSING_ENABLE_TESTING AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if (TEXT_PROCESSING_ENABLE_TESTS AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    message(STATUS "Compiler id is ${CMAKE_CXX_COMPILER_ID}")
     option(TEXT_PROCESSING_ENABLE_FUZZING "Build fuzzing tests" ON)
 endif()
 
@@ -46,7 +47,7 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 endif()
 
-if(TEXT_PROCESSING_ENABLE_TESTING)
+if(TEXT_PROCESSING_ENABLE_TESTS)
     include(FetchContent)
     include(CTest)
     include(GoogleTest)
@@ -70,8 +71,9 @@ if(TEXT_PROCESSING_ENABLE_TESTING)
 
     target_link_libraries(main PRIVATE text_processing gtest_main project_options project_warnings)
     gtest_discover_tests(main)
-endif()
-
-if(TEXT_PROCESSING_ENABLE_FUZZING)
-    add_subdirectory(fuzzer)
+    
+    if(TEXT_PROCESSING_ENABLE_FUZZING)
+	message(STATUS "Fuzzing enabled")
+	add_subdirectory(fuzzer)
+    endif()
 endif()
