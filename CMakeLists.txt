@@ -10,11 +10,13 @@ include(${_project_options_SOURCE_DIR}/Index.cmake)
 project(text_processing VERSION 0.2 LANGUAGES CXX)
 
 project_options(
+    ENABLE_CACHE
     ENABLE_CPPCHECK
     ENABLE_CLANG_TIDY
     ENABLE_SANITIZER_ADDRESS
     ENABLE_SANITIZER_LEAK
     ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
+    ENABLE_COVERAGE
 )
 
 add_library(text_processing INTERFACE 
@@ -30,6 +32,7 @@ add_library(text_processing INTERFACE
 target_include_directories(text_processing INTERFACE include/text_processing)
 option(TEXT_PROCESSING_ENABLE_TESTS "Build tests using gtest" OFF)
 option(TEXT_PROCESSING_ENABLE_TESTS_SANITIZERS "Build tests with sanitizers" ON)
+option(TEXT_PROCESSING_ENABLE_FUZZING "Build fuzzing tests" ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -63,4 +66,8 @@ if(TEXT_PROCESSING_ENABLE_TESTS)
 
     target_link_libraries(main PRIVATE text_processing gtest_main project_options project_warnings)
     gtest_discover_tests(main)
+endif()
+
+if(TEXT_PROCESSING_ENABLE_FUZZING)
+    add_subdirectory(fuzzer)
 endif()

@@ -12,12 +12,24 @@ enum class SplitBehavior
 
 template <typename TextSrc, typename DelimSrc, typename TextT = container_type_t<TextSrc>,
           typename DelimT = container_type_t<DelimSrc>, std::enable_if_t<std::is_same_v<TextT, DelimT>, int> = 0>
-auto split(const TextSrc& t, const DelimSrc& d, SplitBehavior beh = SplitBehavior::KeepEmpty, int start = 0, int end = -1)
+auto split(const TextSrc& t, const DelimSrc& d, SplitBehavior beh = SplitBehavior::KeepEmpty, int start = 0,
+           int end = -1)
 {
     Text text(t);
     Delimiter delimiter(d);
-
     std::vector<std::basic_string_view<TextT>> results;
+
+    if (text.length == 0)
+        return results;
+
+    if (delimiter.length == 0)
+    {
+        results.reserve(text.length);
+        for (int idx = 0; idx < text.length; ++idx)
+            results.emplace_back(text.ptr + idx, 1);
+        return results;
+    }
+
     if (sanitize_index(start, text.length) == npos || sanitize_index(end, text.length) == npos)
         return results;
 
@@ -33,7 +45,7 @@ auto split(const TextSrc& t, const DelimSrc& d, SplitBehavior beh = SplitBehavio
         }
         if (start_ptr != current || beh == SplitBehavior::KeepEmpty)
             results.emplace_back(start_ptr, current - start_ptr);
-        current += delimiter.length;
+        current += std::max(delimiter.length, size_t{1});
         start_ptr = current;
     }
     if (start_ptr != current || beh == SplitBehavior::KeepEmpty)
@@ -43,12 +55,16 @@ auto split(const TextSrc& t, const DelimSrc& d, SplitBehavior beh = SplitBehavio
 
 template <typename TextSrc, typename DelimSrc, typename TextT = container_type_t<TextSrc>,
           typename DelimT = container_type_t<DelimSrc>, std::enable_if_t<std::is_same_v<TextT, DelimT>, int> = 0>
-auto split_any(const TextSrc& t, const DelimSrc& d, SplitBehavior beh = SplitBehavior::KeepEmpty, int start = 0, int end = -1)
+auto split_any(const TextSrc& t, const DelimSrc& d, SplitBehavior beh = SplitBehavior::KeepEmpty, int start = 0,
+               int end = -1)
 {
     Text text(t);
     Delimiters delimiters(d);
-
     std::vector<std::basic_string_view<TextT>> results;
+
+    if (text.length == 0)
+        return results;
+
     if (sanitize_index(start, text.length) == npos || sanitize_index(end, text.length) == npos)
         return results;
 
@@ -73,11 +89,15 @@ auto split_any(const TextSrc& t, const DelimSrc& d, SplitBehavior beh = SplitBeh
 }
 
 template <typename TextSrc, typename Predicate, typename TextT = container_type_t<TextSrc>>
-auto split_if(const TextSrc& t, Predicate pred, SplitBehavior beh = SplitBehavior::KeepEmpty, int start = 0, int end = -1)
+auto split_if(const TextSrc& t, Predicate pred, SplitBehavior beh = SplitBehavior::KeepEmpty, int start = 0,
+              int end = -1)
 {
     Text text(t);
-
     std::vector<std::basic_string_view<TextT>> results;
+
+    if (text.length == 0)
+        return results;
+
     if (sanitize_index(start, text.length) == npos || sanitize_index(end, text.length) == npos)
         return results;
 

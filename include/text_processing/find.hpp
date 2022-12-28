@@ -93,6 +93,9 @@ template <typename TextSrc, typename NeedleSrc, typename TextT = container_type_
           typename NeedleT = container_type_t<NeedleSrc>, std::enable_if_t<std::is_same_v<TextT, NeedleT>, int> = 0>
 int find_any_impl(const TextSrc& t, const NeedleSrc& d, int start = 0, int step = 1)
 {
+    if (step == 0)
+        return npos;
+
     Text text(t);
     Delimiters delimiters(d);
 

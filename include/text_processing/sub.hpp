@@ -46,7 +46,7 @@ auto mid_view(const T& text, int start, int length = def_length)
     length = std::min(static_cast<int>(t.length) - start, length);
     auto end = length < 0 ? length - 1 : start + length - 1;
     if (sanitize_index(end, t.length) == npos)
-        return std::basic_string_view<E>("");
+        return std::basic_string_view<E>{};
     return std::basic_string_view<E>(t.ptr + start, end - start + 1);
 }
 
