@@ -11,7 +11,7 @@ template <typename T>
 struct ReplaceResult
 {
     std::basic_string<T> text;
-    int operations = npos;
+    int operations = 0;
 };
 
 template <typename TextSrc, typename NeedleSrc, typename ReplaceSrc, typename TextT = container_type_t<TextSrc>,
@@ -21,7 +21,7 @@ auto replace_impl(const TextSrc& t, const NeedleSrc& n, const ReplaceSrc& r, int
     -> ReplaceResult<TextT>
 {
     if (sanitize_index(start, t.length()) == npos || sanitize_index(end, t.length()) == npos)
-        return {};
+        return {std::basic_string(t)};
     auto splitted = split(t, n, SplitBehavior::KeepEmpty, start, end);
     return {join(splitted, r), static_cast<int>(splitted.size()) - 1};
 }
@@ -51,7 +51,7 @@ auto replace_if_impl(const TextSrc& t, Predicate pred, const ReplaceSrc& r, int 
     -> ReplaceResult<TextT>
 {
     if (sanitize_index(start, t.length()) == npos || sanitize_index(end, t.length()) == npos)
-        return {};
+        return {std::basic_string(t)};
     auto splitted = split_if(t, pred, SplitBehavior::KeepEmpty, start, end);
     return {join(splitted, r), static_cast<int>(splitted.size()) - 1};
 }
@@ -80,7 +80,7 @@ auto replace_any_impl(const TextSrc& t, const NeedleSrc& d, const ReplaceSrc& r,
     -> ReplaceResult<TextT>
 {
     if (sanitize_index(start, t.length()) == npos || sanitize_index(end, t.length()) == npos)
-        return {};
+        return {std::basic_string(t)};
     auto splitted = split_any(t, d, SplitBehavior::KeepEmpty, start, end);
     return {join(splitted, r), static_cast<int>(splitted.size()) - 1};
 }

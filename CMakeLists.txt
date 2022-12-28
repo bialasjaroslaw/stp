@@ -8,8 +8,11 @@ FetchContent_MakeAvailable(_project_options)
 include(${_project_options_SOURCE_DIR}/Index.cmake)
 
 project(text_processing VERSION 0.2 LANGUAGES CXX)
+option(ENABLE_DEVELOPER_MODE "Enable developer mode" OFF)
+option(TEXT_PROCESSING_ENABLE_TESTING "Enable test build" ON)
 
-project_options(
+include(${_project_options_SOURCE_DIR}/src/DynamicProjectOptions.cmake)
+dynamic_project_options(
     ENABLE_CACHE
     ENABLE_CPPCHECK
     ENABLE_CLANG_TIDY
@@ -30,9 +33,10 @@ add_library(text_processing INTERFACE
     include/text_processing/sub.hpp
 )
 target_include_directories(text_processing INTERFACE include/text_processing)
-option(TEXT_PROCESSING_ENABLE_TESTS "Build tests using gtest" OFF)
-option(TEXT_PROCESSING_ENABLE_TESTS_SANITIZERS "Build tests with sanitizers" ON)
-option(TEXT_PROCESSING_ENABLE_FUZZING "Build fuzzing tests" ON)
+
+if (TEXT_PROCESSING_ENABLE_TESTING AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    option(TEXT_PROCESSING_ENABLE_FUZZING "Build fuzzing tests" ON)
+endif()
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -42,7 +46,7 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
 endif()
 
-if(TEXT_PROCESSING_ENABLE_TESTS)
+if(TEXT_PROCESSING_ENABLE_TESTING)
     include(FetchContent)
     include(CTest)
     include(GoogleTest)

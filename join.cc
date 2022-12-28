@@ -10,6 +10,14 @@ TEST(Join, SimpleWithView)
     EXPECT_EQ(result, "simple string with words"s);
 }
 
+TEST(Join, SimpleWithEmptyView)
+{
+    using namespace std::literals;
+    std::vector<std::string> simple;
+    auto result = Text::join(simple, " ");
+    EXPECT_EQ(result, "");
+}
+
 TEST(Join, SimpleWithString)
 {
     using namespace std::literals;

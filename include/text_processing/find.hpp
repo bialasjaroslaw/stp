@@ -13,6 +13,9 @@ int find_impl(const TextSrc& t, const NeedleSrc& n, int start = 0, int step = 1)
     Text text(t);
     Delimiter needle(n);
 
+    if (needle.length == 0)
+        return npos;
+
     auto current = text.ptr + start;
 
     while (current + needle.length <= text.ptr + text.length && current >= text.ptr)

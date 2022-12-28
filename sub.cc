@@ -29,6 +29,15 @@ TEST(Sub, ViewLeftNegative)
     EXPECT_EQ(result, "simple string with");
 }
 
+TEST(Sub, LeftOutOfBounds)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    std::string_view simple_sv(simple.data(), simple.length());
+    auto result = Text::left(simple_sv, -100);
+    EXPECT_EQ(result, "");
+}
+
 TEST(Sub, StringLeftPositive)
 {
     using namespace std::literals;
@@ -166,6 +175,24 @@ TEST(Sub, ViewMidStartAndNegative)
     std::string_view simple_sv(simple.data(), simple.length());
     auto result = Text::mid(simple_sv, 0, -6);
     EXPECT_EQ(result, "simple string with"s);
+}
+
+TEST(Sub, MidOutOfBoundsStart)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    std::string_view simple_sv(simple.data(), simple.length());
+    auto result = Text::mid(simple_sv, -100);
+    EXPECT_EQ(result, "");
+}
+
+TEST(Sub, MidOutOfBoundsLength)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    std::string_view simple_sv(simple.data(), simple.length());
+    auto result = Text::mid(simple_sv, 0, -100);
+    EXPECT_EQ(result, "");
 }
 
 TEST(Sub, RightEquiMid)

@@ -9,7 +9,7 @@ template <typename T>
 struct RemoveResult
 {
     std::basic_string<T> text;
-    int operations = npos;
+    int operations = 0;
 };
 
 template <typename TextSrc, typename NeedleSrc, typename TextT = container_type_t<TextSrc>,
@@ -18,7 +18,7 @@ auto remove_impl(const TextSrc& t, const NeedleSrc& n, int start = 0, int end = 
 {
     Text txt(t);
     if (sanitize_index(start, txt.length) == npos || sanitize_index(end, txt.length) == npos)
-        return {};
+        return {std::basic_string(t)};
     auto splitted = split(t, n, SplitBehavior::KeepEmpty, start, end);
     return {join(splitted, std::basic_string_view<TextT>{}), static_cast<int>(splitted.size()) - 1};
 }
@@ -60,7 +60,7 @@ auto remove_if_impl(const TextSrc& t, Predicate pred, int start = 0, int end = -
 {
     Text txt(t);
     if (sanitize_index(start, txt.length) == npos || sanitize_index(end, txt.length) == npos)
-        return {};
+        return {std::basic_string(t)};
     auto splitted = split_if(t, pred, SplitBehavior::KeepEmpty, start, end);
     return {join(splitted, std::basic_string_view<TextT>{}), static_cast<int>(splitted.size()) - 1};
 }
@@ -99,7 +99,7 @@ auto remove_any_impl(const TextSrc& t, const NeedleSrc& d, int start = 0, int en
 {
     Text txt(t);
     if (sanitize_index(start, txt.length) == npos || sanitize_index(end, txt.length) == npos)
-        return {};
+        return {std::basic_string(t)};
     auto splitted = split_any(t, d, SplitBehavior::KeepEmpty, start, end);
     return {join(splitted, std::basic_string_view<TextT>{}), static_cast<int>(splitted.size()) - 1};
 }

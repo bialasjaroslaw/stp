@@ -20,6 +20,32 @@ TEST(Split, WideView)
     EXPECT_EQ(result.size(), 4);
 }
 
+TEST(Split, SimpleWithEmptyView)
+{
+    using namespace std::literals;
+    std::string_view simple_sv;
+    auto result = Text::split(simple_sv, " "sv);
+    EXPECT_EQ(result.size(), 0);
+}
+
+TEST(Split, SimpleWithEmptyDelimiter)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    std::string_view simple_sv(simple.data(), simple.length());
+    auto result = Text::split(simple_sv, ""sv);
+    EXPECT_EQ(result.size(), 24);
+}
+
+TEST(Split, OutOfBoundsStart)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    std::string_view simple_sv(simple.data(), simple.length());
+    auto result = Text::split(simple_sv, " "sv, Text::SplitBehavior::KeepEmpty, 100);
+    EXPECT_EQ(result.size(), 1);
+}
+
 TEST(Split, SimpleWithString)
 {
     using namespace std::literals;
@@ -134,6 +160,24 @@ TEST(SplitIf, ValueLargerThan)
     EXPECT_EQ(result_keep, expected);
 }
 
+TEST(SplitIf, SimpleWithEmptyView)
+{
+    using namespace std::literals;
+    std::string_view simple_sv;
+    auto result = Text::split_if(simple_sv, [](auto ch) { return ch > 'u'; });
+    EXPECT_EQ(result.size(), 0);
+}
+
+TEST(SplitIf, OutOfBoundsStart)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    std::string_view simple_sv(simple.data(), simple.length());
+    auto result = Text::split_if(
+        simple_sv, [](auto ch) { return ch > 'u'; }, Text::SplitBehavior::KeepEmpty, 100);
+    EXPECT_EQ(result.size(), 1);
+}
+
 TEST(SplitAny, SimpleWithView)
 {
     using namespace std::literals;
@@ -141,6 +185,23 @@ TEST(SplitAny, SimpleWithView)
     std::string_view simple_sv(simple.data(), simple.length());
     auto result = Text::split_any(simple_sv, " i"sv);
     EXPECT_EQ(result.size(), 7);
+}
+
+TEST(SplitAny, SimpleWithEmptyView)
+{
+    using namespace std::literals;
+    std::string_view simple_sv;
+    auto result = Text::split_any(simple_sv, "tg"sv);
+    EXPECT_EQ(result.size(), 0);
+}
+
+TEST(SplitAny, OutOfBoundsStart)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    std::string_view simple_sv(simple.data(), simple.length());
+    auto result = Text::split_any(simple_sv, "tg"sv, Text::SplitBehavior::KeepEmpty, 100);
+    EXPECT_EQ(result.size(), 1);
 }
 
 TEST(SplitAny, SimpleWithString)

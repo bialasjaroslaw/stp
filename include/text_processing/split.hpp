@@ -31,7 +31,10 @@ auto split(const TextSrc& t, const DelimSrc& d, SplitBehavior beh = SplitBehavio
     }
 
     if (sanitize_index(start, text.length) == npos || sanitize_index(end, text.length) == npos)
+    {
+        results.emplace_back(text.ptr, text.length);
         return results;
+    }
 
     auto start_ptr = text.ptr;
     auto current = text.ptr + start;
@@ -66,7 +69,10 @@ auto split_any(const TextSrc& t, const DelimSrc& d, SplitBehavior beh = SplitBeh
         return results;
 
     if (sanitize_index(start, text.length) == npos || sanitize_index(end, text.length) == npos)
+    {
+        results.emplace_back(text.ptr, text.length);
         return results;
+    }
 
     auto start_ptr = text.ptr;
     auto current = text.ptr + start;
@@ -99,7 +105,10 @@ auto split_if(const TextSrc& t, Predicate pred, SplitBehavior beh = SplitBehavio
         return results;
 
     if (sanitize_index(start, text.length) == npos || sanitize_index(end, text.length) == npos)
+    {
+        results.emplace_back(text.ptr, text.length);
         return results;
+    }
 
     auto start_ptr = text.ptr;
     auto current = text.ptr + start;

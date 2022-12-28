@@ -10,6 +10,30 @@ TEST(Find, SimpleWithView)
     EXPECT_EQ(result, 6);
 }
 
+TEST(Find, SimpleWithViewEmptyNeedle)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    auto result = Text::find(simple, ""sv);
+    EXPECT_EQ(result, Text::npos);
+}
+
+TEST(Find, SimpleWithOutOfBoundsStart)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    auto result = Text::find(simple, " "sv, 100);
+    EXPECT_EQ(result, Text::npos);
+}
+
+TEST(Find, ZeroStep)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    auto result = Text::find(simple, " "sv, 0, 0);
+    EXPECT_EQ(result, Text::npos);
+}
+
 TEST(Find, SimpleWithUint8String)
 {
     using namespace std::literals;
@@ -156,15 +180,31 @@ TEST(Find, ViewNotFound)
 TEST(FindIf, View)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::find_if(simple, [](auto ch) { return ch > 'u'; });
     EXPECT_EQ(result, 14);
+}
+
+TEST(FindIf, OutOfBoundsStart)
+{
+    using namespace std::literals;
+    std::string_view simple("simple string with words");
+    auto result = Text::find_if(simple, [](auto ch) { return ch > 'u'; }, 100);
+    EXPECT_EQ(result, Text::npos);
+}
+
+TEST(FindIf, ZeroStep)
+{
+    using namespace std::literals;
+    std::string_view simple("simple string with words");
+    auto result = Text::find_if(simple, [](auto ch) { return ch > 'u'; }, 0, 0);
+    EXPECT_EQ(result, Text::npos);
 }
 
 TEST(FindIf, WideView)
 {
     using namespace std::literals;
-    std::wstring simple(L"simple string with words");
+    std::wstring_view simple(L"simple string with words");
     auto result = Text::find_if(simple, [](auto ch) { return ch > 'u'; });
     EXPECT_EQ(result, 14);
 }
@@ -172,7 +212,7 @@ TEST(FindIf, WideView)
 TEST(FindIf, ViewWithStart)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::find_if(
         simple, [](auto ch) { return ch > 'u'; }, 15);
     EXPECT_EQ(result, 19);
@@ -181,15 +221,39 @@ TEST(FindIf, ViewWithStart)
 TEST(RFind, SimpleWithView)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::rfind(simple, " "sv);
     EXPECT_EQ(result, 18);
+}
+
+TEST(RFind, SimpleWithOutOfBoundsStart)
+{
+    using namespace std::literals;
+    std::string_view simple("simple string with words");
+    auto result = Text::rfind(simple, " "sv, 100);
+    EXPECT_EQ(result, Text::npos);
+}
+
+TEST(RFind, ZeroStep)
+{
+    using namespace std::literals;
+    std::string_view simple("simple string with words");
+    auto result = Text::rfind(simple, " "sv, 0, 0);
+    EXPECT_EQ(result, Text::npos);
+}
+
+TEST(RFindIf, ZeroStep)
+{
+    using namespace std::literals;
+    std::string_view simple("simple string with words");
+    auto result = Text::rfind_if(simple, [](auto ch) { return ch > 'u'; }, 0, 0);
+    EXPECT_EQ(result, Text::npos);
 }
 
 TEST(RFind, ViewWithNegativeStart)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::rfind(simple, " "sv, -8);
     EXPECT_EQ(result, 6);
 }
@@ -197,7 +261,7 @@ TEST(RFind, ViewWithNegativeStart)
 TEST(RFind, ViewWithStep)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::rfind(simple, " "sv, 2, 2);
     EXPECT_EQ(result, 13);
 }
@@ -205,7 +269,7 @@ TEST(RFind, ViewWithStep)
 TEST(RFind, SimpleWithViewAndStart)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::rfind(simple, " "sv, 7);
     EXPECT_EQ(result, 13);
 }
@@ -213,15 +277,23 @@ TEST(RFind, SimpleWithViewAndStart)
 TEST(RFindIf, View)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::rfind_if(simple, [](auto ch) { return ch > 'u'; });
     EXPECT_EQ(result, 19);
+}
+
+TEST(RFindIf, OutOfBoundsStart)
+{
+    using namespace std::literals;
+    std::string_view simple("simple string with words");
+    auto result = Text::rfind_if(simple, [](auto ch) { return ch > 'u'; }, 100);
+    EXPECT_EQ(result, Text::npos);
 }
 
 TEST(RFindIf, ViewWithStart)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::find_if(
         simple, [](auto ch) { return ch > 'u'; }, 5);
     EXPECT_EQ(result, 14);
@@ -230,15 +302,31 @@ TEST(RFindIf, ViewWithStart)
 TEST(FindAny, SimpleWithView)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::find_any(simple, "tg"sv);
     EXPECT_EQ(result, 8);
+}
+
+TEST(FindAny, OutOfBoundsStart)
+{
+    using namespace std::literals;
+    std::string_view simple("simple string with words");
+    auto result = Text::find_any(simple, "tg"sv, 100);
+    EXPECT_EQ(result, Text::npos);
+}
+
+TEST(FindAny, ZeroStep)
+{
+    using namespace std::literals;
+    std::string_view simple("simple string with words");
+    auto result = Text::find_any(simple, "tg"sv, 0, 0);
+    EXPECT_EQ(result, Text::npos);
 }
 
 TEST(FindAny, SimpleWithString)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::find_any(simple, "tg"s);
     EXPECT_EQ(result, 8);
 }
@@ -246,7 +334,7 @@ TEST(FindAny, SimpleWithString)
 TEST(FindAny, SimpleWithConstChar)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::find_any(simple, "tg");
     EXPECT_EQ(result, 8);
 }
@@ -254,7 +342,7 @@ TEST(FindAny, SimpleWithConstChar)
 TEST(FindAny, MultipleWithView)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto start = 0;
     auto result = 0;
     std::vector<int> expected{8, 12, 16};
@@ -272,7 +360,7 @@ TEST(FindAny, MultipleWithView)
 TEST(FindAny, ViewWithNegativeStart)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::find_any(simple, "tg"sv, -8);
     EXPECT_EQ(result, 16);
 }
@@ -280,7 +368,7 @@ TEST(FindAny, ViewWithNegativeStart)
 TEST(FindAny, WideView)
 {
     using namespace std::literals;
-    std::wstring simple(L"simple string with words");
+    std::wstring_view simple(L"simple string with words");
     auto result = Text::find_any(simple, L"tg"sv, -8);
     EXPECT_EQ(result, 16);
 }
@@ -288,15 +376,31 @@ TEST(FindAny, WideView)
 TEST(RFindAny, SimpleWithView)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::rfind_any(simple, "tg"sv);
     EXPECT_EQ(result, 16);
+}
+
+TEST(RFindAny, OutOfBoundsStart)
+{
+    using namespace std::literals;
+    std::string_view simple("simple string with words");
+    auto result = Text::rfind_any(simple, "tg"sv, 100);
+    EXPECT_EQ(result, Text::npos);
+}
+
+TEST(RFindAny, ZeroStep)
+{
+    using namespace std::literals;
+    std::string_view simple("simple string with words");
+    auto result = Text::rfind_any(simple, "tg"sv, 0, 0);
+    EXPECT_EQ(result, Text::npos);
 }
 
 TEST(RFindAny, SimpleWithString)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::rfind_any(simple, "tg"s);
     EXPECT_EQ(result, 16);
 }
@@ -304,7 +408,7 @@ TEST(RFindAny, SimpleWithString)
 TEST(RFindAny, SimpleWithConstChar)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::rfind_any(simple, "tg");
     EXPECT_EQ(result, 16);
 }
@@ -312,7 +416,7 @@ TEST(RFindAny, SimpleWithConstChar)
 TEST(RFindAny, MultipleWithView)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto start = simple.length();
     auto result = 0;
     std::vector<int> expected{16, 12, 8};
@@ -330,7 +434,7 @@ TEST(RFindAny, MultipleWithView)
 TEST(RFindAny, ViewWithNegativeStart)
 {
     using namespace std::literals;
-    std::string simple("simple string with words");
+    std::string_view simple("simple string with words");
     auto result = Text::rfind_any(simple, "tg"sv, -12);
     EXPECT_EQ(result, 8);
 }
