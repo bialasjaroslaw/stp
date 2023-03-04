@@ -25,7 +25,7 @@ int find_impl(const TextSrc& t, const NeedleSrc& n, int start = 0, int step = 1)
             current += step;
             continue;
         }
-        return current - text.ptr;
+        return static_cast<int>(current - text.ptr);
     }
     return npos;
 }
@@ -49,7 +49,7 @@ int rfind(const TextSrc& t, const NeedleSrc& n, int start = 0, int step = 1)
     if (sanitize_index(start, text.length) == npos)
         return npos;
     start = std::max(start, static_cast<int>(needle.length - 1));
-    return find_impl(t, n, text.length - start - 1, -step);
+    return find_impl(t, n, static_cast<int>(text.length - start - 1), -step);
 }
 
 template <typename TextSrc, typename Predicate, typename TextT = container_type_t<TextSrc>>
@@ -69,7 +69,7 @@ int find_if_impl(const TextSrc& t, Predicate pred, int start = 0, int step = 1)
             current += step;
             continue;
         }
-        return current - text.ptr;
+        return static_cast<int>(current - text.ptr);
     }
     return npos;
 }
@@ -89,7 +89,7 @@ int rfind_if(const TextSrc& t, Predicate pred, int start = 0, int step = 1)
     Text text(t);
     if (sanitize_index(start, text.length) == npos)
         return npos;
-    return find_if_impl(t, pred, text.length - start - 1, -step);
+    return find_if_impl(t, pred, static_cast<int>(text.length - start - 1), -step);
 }
 
 template <typename TextSrc, typename NeedleSrc, typename TextT = container_type_t<TextSrc>,
@@ -111,7 +111,7 @@ int find_any_impl(const TextSrc& t, const NeedleSrc& d, int start = 0, int step 
             current += step;
             continue;
         }
-        return current - text.ptr;
+        return static_cast<int>(current - text.ptr);
     }
     return npos;
 }
@@ -133,7 +133,7 @@ int rfind_any(const TextSrc& t, const NeedleSrc& d, int start = 0, int step = 1)
     Text text(t);
     if (sanitize_index(start, text.length) == npos)
         return npos;
-    return find_any_impl(t, d, text.length - start - 1, -step);
+    return find_any_impl(t, d, static_cast<int>(text.length - start - 1), -step);
 }
 
 } // namespace Text

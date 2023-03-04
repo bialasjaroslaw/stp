@@ -25,7 +25,7 @@ auto split(const TextSrc& t, const DelimSrc& d, SplitBehavior beh = SplitBehavio
     if (delimiter.length == 0)
     {
         results.reserve(text.length);
-        for (int idx = 0; idx < text.length; ++idx)
+        for (size_t idx = 0; idx < text.length; ++idx)
             results.emplace_back(text.ptr + idx, 1);
         return results;
     }
