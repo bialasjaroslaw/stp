@@ -11,10 +11,11 @@ project(text_processing VERSION 0.2 LANGUAGES CXX)
 option(ENABLE_DEVELOPER_MODE "Enable developer mode" OFF)
 option(TEXT_PROCESSING_ENABLE_TESTS "Enable test build" ON)
 
+set(ENABLE_SANITIZER_ADDRESS "ENABLE_SANITIZER_ADDRESS")
 if(MSVC)
     string(FIND "$ENV{PATH}" "$ENV{VSINSTALLDIR}" index_of_vs_install_dir)
-    if(MSVC AND "${index_of_vs_install_dir}" STREQUAL "-1")
-        set(ENABLE_SANITIZER_ADDRESS "ENABLE_SANITIZER_ADDRESS")
+    if(NOT "${index_of_vs_install_dir}" STREQUAL "-1")
+        set(ENABLE_SANITIZER_ADDRESS "")
     endif()
 endif()
 
