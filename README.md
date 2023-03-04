@@ -28,11 +28,12 @@ When it comes to start index, behavior is the same as it is in case of operation
 
 ## Further work
 Fix std::vector based operations:
-* Allow to use any type as delimiter without wrapping it inside std::vector
-* Use more generic formula to limit available types for Text and Delimiter construction (right now only std::basic_string, std::basic_string_view, char_t* and wchar_t* are allowed)
-* Add case_sensitive/insensitive_flag
-* Distinguish between element iterator(index) and boundary iterator (between two elements)
-* Add fuzzing
+* [X] Allow to use any type as delimiter without wrapping it inside std::vector
+* [ ] Use more generic formula to limit available types for Text and Delimiter construction (right now only std::basic_string, std::basic_string_view, char_t* and wchar_t* are allowed)
+* [ ] Add case_sensitive/insensitive_flag
+* [ ] Distinguish between element iterator(index) and boundary iterator (between two elements)
+* [X] Add fuzzing
+* [ ] Add example usage in README.md
 
 I have not done any benchmarks yet, so feel free to do so. 
 
