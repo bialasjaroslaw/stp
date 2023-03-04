@@ -68,7 +68,7 @@ template <typename T>
 using container_type = container_type_detail<remove_all_const_t<std::decay_t<T>>>;
 
 template <typename T>
-using container_type_t = typename container_type_detail<remove_all_const_t<std::decay_t<T>>>::value_type;
+using container_type_t = typename container_type<T>::value_type;
 
 template <typename E>
 constexpr std::size_t strlen(const E* start)
@@ -76,7 +76,7 @@ constexpr std::size_t strlen(const E* start)
     const auto* end = start;
     for (; *end != 0; ++end)
         ;
-    return end - start;
+    return static_cast<size_t>(end - start);
 }
 
 template <typename T>
