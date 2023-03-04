@@ -10,13 +10,15 @@
 
 void count_needle(const uint8_t* Data, size_t Size)
 {
-    auto pred = [](auto ch) { return ch > 'p'; };
-    for (int text_size = 1; text_size < Size - 1; ++text_size)
+    auto pred = [delim = *Data](auto ch) { return ch > delim; };
+    ++Data;
+    --Size;
+    for (auto text_size = 1; text_size < Size - 1; ++text_size)
     {
-        std::basic_string_view<uint8_t> data(Data, text_size);
-        std::basic_string_view<uint8_t> needle(Data + text_size, Size - text_size);
+        const std::basic_string_view<uint8_t> data(Data, text_size);
+        const std::basic_string_view<uint8_t> needle(Data + text_size, Size - text_size);
 
-        for (int start_idx = -text_size; start_idx <= text_size; ++start_idx)
+        for (auto start_idx = -text_size; start_idx <= text_size; ++start_idx)
         {
             for (int end_idx = -text_size; end_idx <= text_size; ++end_idx)
             {
@@ -30,11 +32,13 @@ void count_needle(const uint8_t* Data, size_t Size)
 
 void find_needle(const uint8_t* Data, size_t Size)
 {
-    auto pred = [](auto ch) { return ch > 'p'; };
+    auto pred = [delim = *Data](auto ch) { return ch > delim; };
+    ++Data;
+    --Size;
     for (int text_size = 1; text_size < Size - 1; ++text_size)
     {
-        std::basic_string_view<uint8_t> data(Data, text_size);
-        std::basic_string_view<uint8_t> needle(Data + text_size, Size - text_size);
+        const std::basic_string_view<uint8_t> data(Data, text_size);
+        const std::basic_string_view<uint8_t> needle(Data + text_size, Size - text_size);
         for (int start_idx = -text_size; start_idx <= text_size; ++start_idx)
         {
             for (int step = -text_size; step <= text_size; ++step)
@@ -54,19 +58,21 @@ void join_needle(const uint8_t* Data, size_t Size)
 {
     std::vector<std::basic_string_view<uint8_t>> input;
     auto view_size = 2;
-    for(int idx = view_size ; idx < Size ; idx += view_size)
+    for (int idx = view_size; idx < Size; idx += view_size)
         input.emplace_back(Data + idx - view_size, view_size);
     std::basic_string_view<uint8_t> needle(Data + Size - (Size % 2), Size % 2);
-        
+
     Text::join(input, needle);
 }
 
 void remove_needle(const uint8_t* Data, size_t Size)
 {
-    auto pred = [](auto ch) { return ch > 'p'; };
+    auto pred = [delim = *Data](auto ch) { return ch > delim; };
+    ++Data;
+    --Size;
     for (int text_size = 1; text_size < Size - 1; ++text_size)
     {
-        std::basic_string_view<uint8_t> needle(Data + text_size, Size - text_size);
+        const std::basic_string_view<uint8_t> needle(Data + text_size, Size - text_size);
         std::basic_string<uint8_t> data(Data, text_size);
         auto reset = [&data, Data, text_size]() {
             data.resize(text_size);
@@ -104,8 +110,9 @@ void replace_needle(const uint8_t* Data, size_t Size)
     {
         for (int needle_size = 0; needle_size < Size - text_size - 1; ++needle_size)
         {
-            std::basic_string_view<uint8_t> needle(Data + text_size, needle_size);
-            std::basic_string_view<uint8_t> replace(Data + text_size + needle_size, Size - text_size - needle_size);
+            const std::basic_string_view<uint8_t> needle(Data + text_size, needle_size);
+            const std::basic_string_view<uint8_t> replace(Data + text_size + needle_size,
+                                                          Size - text_size - needle_size);
             std::basic_string<uint8_t> data(Data, text_size);
             auto reset = [&data, Data, text_size]() {
                 data.resize(text_size);
@@ -133,11 +140,13 @@ void replace_needle(const uint8_t* Data, size_t Size)
 
 void split_needle(const uint8_t* Data, size_t Size)
 {
-    auto pred = [](auto ch) { return ch > 'p'; };
+    auto pred = [delim = *Data](auto ch) { return ch > delim; };
+    ++Data;
+    --Size;
     for (int text_size = 1; text_size < Size - 1; ++text_size)
     {
-        std::basic_string_view<uint8_t> data(Data, text_size);
-        std::basic_string_view<uint8_t> needle(Data + text_size, Size - text_size);
+        const std::basic_string_view<uint8_t> data(Data, text_size);
+        const std::basic_string_view<uint8_t> needle(Data + text_size, Size - text_size);
 
         for (int start_idx = -text_size; start_idx <= text_size; ++start_idx)
         {
@@ -156,12 +165,12 @@ void split_needle(const uint8_t* Data, size_t Size)
 
 void sub_fuzzing(const uint8_t* Data, size_t Size)
 {
-    std::basic_string_view<uint8_t> data(Data, Size);
-    for (int text_size = -Size; text_size < Size + 2 ; ++text_size)
+    const std::basic_string_view<uint8_t> data(Data, Size);
+    for (int text_size = -Size; text_size < Size + 2; ++text_size)
     {
         Text::left_view(data, text_size);
         Text::right_view(data, text_size);
-        for (int text_length = -Size; text_length < Size + 2 ; ++text_length)
+        for (int text_length = -Size; text_length < Size + 2; ++text_length)
             Text::mid_view(data, text_size, text_length);
     }
 }

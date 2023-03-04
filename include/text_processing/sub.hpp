@@ -11,7 +11,7 @@ auto left_view(const T& text, int length)
     length = std::min(static_cast<int>(t.length), length);
     if (sanitize_index(length, t.length) == npos)
         return std::basic_string_view<E>{};
-    return std::basic_string_view<E>(t.ptr, length);
+    return std::basic_string_view<E>(t.ptr, static_cast<size_t>(length));
 }
 
 template <typename T, typename E = container_type_t<T>>
@@ -27,7 +27,7 @@ auto right_view(const T& text, int length)
     length = std::min(static_cast<int>(t.length), length);
     if (sanitize_index(length, t.length) == npos)
         return std::basic_string_view<E>{};
-    return std::basic_string_view<E>(t.ptr + t.length - length, length);
+    return std::basic_string_view<E>(t.ptr + t.length - length, static_cast<size_t>(length));
 }
 
 template <typename T, typename E = container_type_t<T>>
@@ -47,7 +47,7 @@ auto mid_view(const T& text, int start, int length = def_length)
     auto end = length < 0 ? length - 1 : start + length - 1;
     if (sanitize_index(end, t.length) == npos)
         return std::basic_string_view<E>{};
-    return std::basic_string_view<E>(t.ptr + start, end - start + 1);
+    return std::basic_string_view<E>(t.ptr + start, static_cast<size_t>(end - start + 1));
 }
 
 template <typename T, typename E = container_type_t<T>>
