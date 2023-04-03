@@ -8,7 +8,7 @@ FetchContent_MakeAvailable(_project_options)
 include(${_project_options_SOURCE_DIR}/Index.cmake)
 
 project(text_processing VERSION 0.2 LANGUAGES CXX)
-option(ENABLE_DEVELOPER_MODE "Enable developer mode" OFF)
+option(DEVELOPER_BUILD "Enable developer mode" OFF)
 option(TEXT_PROCESSING_ENABLE_TESTS "Enable test build" ON)
 
 set(ENABLE_SANITIZER_ADDRESS "ENABLE_SANITIZER_ADDRESS")
@@ -19,16 +19,18 @@ if(MSVC)
     endif()
 endif()
 
-include(${_project_options_SOURCE_DIR}/src/DynamicProjectOptions.cmake)
-dynamic_project_options(
-    ENABLE_CACHE
-    ENABLE_CPPCHECK
-    ENABLE_CLANG_TIDY
-    ${ENABLE_SANITIZER_ADDRESS}
-    ENABLE_SANITIZER_LEAK
-    ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
-    ENABLE_COVERAGE
-)
+if(DEVELOPER_BUILD)
+    include(${_project_options_SOURCE_DIR}/src/DynamicProjectOptions.cmake)
+    dynamic_project_options(
+	ENABLE_CACHE
+	ENABLE_CPPCHECK
+	ENABLE_CLANG_TIDY
+	${ENABLE_SANITIZER_ADDRESS}
+	ENABLE_SANITIZER_LEAK
+	ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
+	ENABLE_COVERAGE
+    )
+endif()
 
 add_library(text_processing INTERFACE 
     include/text_processing/common.hpp
@@ -66,6 +68,7 @@ if(TEXT_PROCESSING_ENABLE_TESTS)
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
     add_executable(main 
+	common.cc
 	count.cc
 	find.cc
 	join.cc 
@@ -75,11 +78,14 @@ if(TEXT_PROCESSING_ENABLE_TESTS)
 	sub.cc
     )
 
-    target_link_libraries(main PRIVATE text_processing gtest_main project_options project_warnings)
+    target_link_libraries(main PRIVATE text_processing gtest_main)
+    if(DEVELOPER_BUILD)
+	target_link_libraries(main PRIVATE project_options project_warnings)
+	if(TEXT_PROCESSING_ENABLE_FUZZING)
+	    message(STATUS "Fuzzing enabled")
+	    add_subdirectory(fuzzer)
+	endif()
+    endif()
     gtest_discover_tests(main)
     
-    if(TEXT_PROCESSING_ENABLE_FUZZING)
-	message(STATUS "Fuzzing enabled")
-	add_subdirectory(fuzzer)
-    endif()
 endif()
