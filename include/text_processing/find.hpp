@@ -4,7 +4,7 @@
 
 namespace Text {
 template <typename TextSrc, typename NeedleSrc, typename TextT = container_type_t<TextSrc>,
-          typename NeedleT = container_type_t<NeedleSrc>, std::enable_if_t<std::is_same_v<TextT, NeedleT>, int> = 0>
+          typename NeedleT = container_type_t<NeedleSrc>, std::enable_if_t<std::is_same_v<TextT, NeedleT>, int> = 0> requires std::equality_comparable<TextT>
 int find_impl(const TextSrc& t, const NeedleSrc& n, int start = 0, int step = 1)
 {
     if (step == 0)

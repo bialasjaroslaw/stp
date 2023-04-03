@@ -253,3 +253,12 @@ TEST(SplitAny, MultipleDelimiters)
     EXPECT_EQ(result_keep.size(), 7 + 5);
     EXPECT_EQ(result_drop.size(), 7);
 }
+
+TEST(Split, IntVector)
+{
+    std::vector<int> data{1, 2, 3, 1, 1, 2, 3, 1, 4, 1};
+    auto result_keep = Text::split(data, 1, Text::SplitBehavior::KeepEmpty);
+    auto result_drop = Text::split(data, 1, Text::SplitBehavior::DropEmpty);
+    EXPECT_EQ(result_keep.size(), 3 + 3);
+    EXPECT_EQ(result_drop.size(), 3);
+}

@@ -60,12 +60,12 @@ TEST(Find, SimpleWithUint16Vector)
 
 TEST(Find, CustomType)
 {
-    struct MyType{
+    struct MyType
+    {
         int val;
         bool operator==(const MyType&) const = default;
     };
 
-    using namespace std::literals;
     std::vector<MyType> simple{{0}, {1337}};
     auto result = Text::find(simple, std::vector<MyType>{{1337}});
     EXPECT_EQ(result, 1);
@@ -189,7 +189,8 @@ TEST(FindIf, OutOfBoundsStart)
 {
     using namespace std::literals;
     std::string_view simple("simple string with words");
-    auto result = Text::find_if(simple, [](auto ch) { return ch > 'u'; }, 100);
+    auto result = Text::find_if(
+        simple, [](auto ch) { return ch > 'u'; }, 100);
     EXPECT_EQ(result, Text::npos);
 }
 
@@ -197,7 +198,8 @@ TEST(FindIf, ZeroStep)
 {
     using namespace std::literals;
     std::string_view simple("simple string with words");
-    auto result = Text::find_if(simple, [](auto ch) { return ch > 'u'; }, 0, 0);
+    auto result = Text::find_if(
+        simple, [](auto ch) { return ch > 'u'; }, 0, 0);
     EXPECT_EQ(result, Text::npos);
 }
 
@@ -246,7 +248,8 @@ TEST(RFindIf, ZeroStep)
 {
     using namespace std::literals;
     std::string_view simple("simple string with words");
-    auto result = Text::rfind_if(simple, [](auto ch) { return ch > 'u'; }, 0, 0);
+    auto result = Text::rfind_if(
+        simple, [](auto ch) { return ch > 'u'; }, 0, 0);
     EXPECT_EQ(result, Text::npos);
 }
 
@@ -286,7 +289,8 @@ TEST(RFindIf, OutOfBoundsStart)
 {
     using namespace std::literals;
     std::string_view simple("simple string with words");
-    auto result = Text::rfind_if(simple, [](auto ch) { return ch > 'u'; }, 100);
+    auto result = Text::rfind_if(
+        simple, [](auto ch) { return ch > 'u'; }, 100);
     EXPECT_EQ(result, Text::npos);
 }
 

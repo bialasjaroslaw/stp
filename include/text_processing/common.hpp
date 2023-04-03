@@ -1,9 +1,11 @@
 #pragma once
 
+#include <array>
 #include <limits>
 #include <set>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <vector>
 
 template <class CharType>
@@ -11,64 +13,67 @@ using StringType = std::basic_string<CharType>;
 template <class CharType>
 using StringViewType = std::basic_string_view<CharType>;
 
+template <typename T>
+concept DataContainer = requires(T x) {
+                            x.data();
+                            x.size();
+                            typename std::remove_reference_t<T>::value_type;
+                        };
+
+template <class T>
+concept CStyleArray = std::is_array_v<T>;
+
+namespace detail {
+template <typename T>
+struct container_type
+{
+    using value_type = std::remove_cvref_t<T>;
+};
+
+template <typename T>
+    requires std::is_pointer_v<T>
+struct container_type<T>
+{
+    using value_type = std::remove_cv_t<std::remove_pointer_t<T>>;
+};
+
+template <typename T>
+    requires std::is_array_v<T>
+struct container_type<T>
+{
+    using value_type = std::remove_cv_t<std::remove_extent_t<T>>;
+};
+
+template <typename T>
+    requires requires(T) { typename std::remove_reference_t<T>::value_type; }
+struct container_type<T>
+{
+    using value_type = typename std::remove_reference_t<T>::value_type;
+};
+} // namespace detail
+
+template <typename T>
+using container_type_t = typename detail::container_type<T>::value_type;
+
 namespace Text {
 constexpr int npos = -1;
 constexpr int def_length = std::numeric_limits<int>::max();
 
 template <typename T>
-struct remove_all_const : std::remove_const<T>
-{};
+auto to_vector(const std::basic_string_view<T>& container)
+{
+    return std::vector<T>(container.cbegin(), container.cend());
+}
 
 template <typename T>
-struct remove_all_const<T*>
+auto to_vector(const std::vector<std::basic_string_view<T>>& container)
 {
-    typedef typename remove_all_const<T>::type* type;
-};
-
-template <typename T>
-struct remove_all_const<T* const>
-{
-    typedef typename remove_all_const<T>::type* type;
-};
-
-template <typename T>
-using remove_all_const_t = typename remove_all_const<T>::type;
-
-template <typename E>
-struct container_type_detail
-{
-    using value_type = typename E::value_type;
-};
-
-template <>
-struct container_type_detail<char*>
-{
-    using value_type = char;
-};
-
-template <>
-struct container_type_detail<char>
-{
-    using value_type = char;
-};
-
-template <>
-struct container_type_detail<wchar_t*>
-{
-    using value_type = wchar_t;
-};
-
-template <>
-struct container_type_detail<wchar_t>
-{
-    using value_type = wchar_t;
-};
-
-template <typename T>
-using container_type = container_type_detail<remove_all_const_t<std::decay_t<T>>>;
-
-template <typename T>
-using container_type_t = typename container_type<T>::value_type;
+    std::vector<std::vector<T>> result;
+    result.reserve(container.size());
+    for (const auto& elem : container)
+        result.emplace_back(elem.cbegin(), elem.cend());
+    return result;
+}
 
 template <typename E>
 constexpr std::size_t strlen(const E* start)
@@ -122,27 +127,23 @@ struct Text
     using value_type = E;
     const E* ptr = nullptr;
     size_t length = 0;
-    explicit constexpr Text(const std::basic_string<E>& str)
-    {
-        ptr = str.data();
-        length = str.size();
-    }
-    explicit constexpr Text(std::basic_string_view<E> str)
-    {
-        ptr = str.data();
-        length = str.size();
-    }
-    explicit constexpr Text(const std::vector<E>& str)
-    {
-        ptr = str.data();
-        length = str.size();
-    }
     explicit constexpr Text(const E* str)
     {
         ptr = str;
         length = strlen(str);
     }
+    template <DataContainer T>
+    explicit constexpr Text(const T& container)
+    {
+        ptr = container.data();
+        length = container.size();
+    }
 };
+template <DataContainer T>
+Text(const T& container) -> Text<typename std::remove_reference_t<T>::value_type>;
+template <CStyleArray T>
+Text(const T& array) -> Text<typename std::remove_pointer_t<std::decay_t<T>>>;
+
 
 template <typename E>
 struct Delimiter
@@ -150,45 +151,41 @@ struct Delimiter
     E elem = {};
     const E* ptr = nullptr;
     size_t length = 0;
-    explicit constexpr Delimiter(const std::basic_string<E>& str)
-    {
-        ptr = str.data();
-        length = str.size();
-    }
-    explicit constexpr Delimiter(std::basic_string_view<E> str)
-    {
-        ptr = str.data();
-        length = str.size();
-    }
-    explicit constexpr Delimiter(const std::vector<E>& str)
-    {
-        ptr = str.data();
-        length = str.size();
-    }
     explicit constexpr Delimiter(const E* str)
     {
         ptr = str;
         length = strlen(str);
     }
+    template <typename N = void>
+        requires(!std::is_pointer_v<E>)
     explicit constexpr Delimiter(E str)
         : elem(str)
         , ptr(&elem)
         , length(1)
     {}
+    template <DataContainer T>
+    explicit constexpr Delimiter(const T& container)
+    {
+        ptr = container.data();
+        length = container.size();
+    }
 };
+
+template <DataContainer T>
+Delimiter(const T& container) -> Delimiter<typename std::remove_reference_t<T>::value_type>;
+template <CStyleArray T>
+Delimiter(const T& array) -> Delimiter<typename std::remove_pointer_t<std::decay_t<T>>>;
 
 template <typename E>
 struct Delimiters
 {
     std::set<E> delimiters;
-    explicit constexpr Delimiters(const std::basic_string<E>& str)
-        : delimiters{str.cbegin(), str.cend()}
-    {}
-    explicit constexpr Delimiters(std::basic_string_view<E> str)
-        : delimiters{str.cbegin(), str.cend()}
-    {}
     explicit constexpr Delimiters(const E* str)
         : delimiters{str, str + strlen(str)}
+    {}
+    template <typename T>
+    explicit constexpr Delimiters(const T& container)
+        : delimiters{container.cbegin(), container.cend()}
     {}
 
     constexpr bool contains(E ch) const
@@ -196,4 +193,7 @@ struct Delimiters
         return delimiters.contains(ch);
     }
 };
+
+template <DataContainer T>
+Delimiters(const T& container) -> Delimiters<typename std::remove_reference_t<T>::value_type>;
 } // namespace Text
