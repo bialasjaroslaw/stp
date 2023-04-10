@@ -56,8 +56,9 @@ template <typename T>
 using container_type_t = typename detail::container_type<T>::value_type;
 
 namespace Text {
-constexpr int npos = -1;
-constexpr int def_length = std::numeric_limits<int>::max();
+constexpr int Start = 0;
+constexpr int End = std::numeric_limits<int>::max();
+constexpr int Step = 1;
 
 template <typename T>
 auto to_vector(const std::basic_string_view<T>& container)
@@ -111,13 +112,16 @@ constexpr T clamp(T value, T low_value, T high_value)
     return value;
 }
 
-template <typename T>
-constexpr T sanitize_index(T& index, size_t text_size)
+template <typename T, typename Value = std::remove_cvref_t<T>>
+constexpr Value sanitize_index(T&& index, size_t text_size)
 {
-    if (index < T{0})
-        index = index + static_cast<T>(text_size);
-    if (text_size == 0 || index != clamp(index, T{0}, static_cast<T>(text_size - 1)))
-        return npos;
+    if (index < Value{0})
+        index = index + static_cast<Value>(text_size);
+    else if (index == Text::End)
+        index = text_size;
+
+    if (text_size == 0 || index != clamp(index, Value{0}, static_cast<Value>(text_size)))
+        return Text::End;
     return index;
 }
 

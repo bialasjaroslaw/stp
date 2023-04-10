@@ -14,10 +14,10 @@ struct RemoveResult
 
 template <typename TextSrc, typename NeedleSrc, typename TextT = container_type_t<TextSrc>,
           typename NeedleT = container_type_t<NeedleSrc>, std::enable_if_t<std::is_same_v<TextT, NeedleT>, int> = 0>
-auto remove_impl(const TextSrc& t, const NeedleSrc& n, int start = 0, int end = -1) -> RemoveResult<TextT>
+auto remove_impl(const TextSrc& t, const NeedleSrc& n, int start = Start, int end = End) -> RemoveResult<TextT>
 {
     Text txt(t);
-    if (sanitize_index(start, txt.length) == npos || sanitize_index(end, txt.length) == npos)
+    if (sanitize_index(start, txt.length) == End || sanitize_index(end, txt.length) == End)
         return {std::basic_string(t)};
     auto splitted = split(t, n, SplitBehavior::KeepEmpty, start, end);
     return {join(splitted, std::basic_string_view<TextT>{}), static_cast<int>(splitted.size()) - 1};
@@ -56,10 +56,10 @@ template <typename TextSrc, typename NeedleSrc, typename TextT = container_type_
 }
 
 template <typename TextSrc, typename TextT = container_type_t<TextSrc>, typename Predicate>
-auto remove_if_impl(const TextSrc& t, Predicate pred, int start = 0, int end = -1) -> RemoveResult<TextT>
+auto remove_if_impl(const TextSrc& t, Predicate pred, int start = Start, int end = End) -> RemoveResult<TextT>
 {
     Text txt(t);
-    if (sanitize_index(start, txt.length) == npos || sanitize_index(end, txt.length) == npos)
+    if (sanitize_index(start, txt.length) == End || sanitize_index(end, txt.length) == End)
         return {std::basic_string(t)};
     auto splitted = split_if(t, pred, SplitBehavior::KeepEmpty, start, end);
     return {join(splitted, std::basic_string_view<TextT>{}), static_cast<int>(splitted.size()) - 1};
@@ -95,10 +95,10 @@ template <typename TextSrc, typename TextT = container_type_t<TextSrc>, typename
 
 template <typename TextSrc, typename NeedleSrc, typename TextT = container_type_t<TextSrc>,
           typename NeedleT = container_type_t<NeedleSrc>, std::enable_if_t<std::is_same_v<TextT, NeedleT>, int> = 0>
-auto remove_any_impl(const TextSrc& t, const NeedleSrc& d, int start = 0, int end = -1) -> RemoveResult<TextT>
+auto remove_any_impl(const TextSrc& t, const NeedleSrc& d, int start = Start, int end = End) -> RemoveResult<TextT>
 {
     Text txt(t);
-    if (sanitize_index(start, txt.length) == npos || sanitize_index(end, txt.length) == npos)
+    if (sanitize_index(start, txt.length) == End || sanitize_index(end, txt.length) == End)
         return {std::basic_string(t)};
     auto splitted = split_any(t, d, SplitBehavior::KeepEmpty, start, end);
     return {join(splitted, std::basic_string_view<TextT>{}), static_cast<int>(splitted.size()) - 1};

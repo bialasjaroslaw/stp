@@ -2,6 +2,22 @@
 
 #include <gtest/gtest.h>
 
+TEST(Common, SanitizeIndex)
+{
+    int index = -1;
+    EXPECT_EQ(23, Text::sanitize_index(index, 24));
+}
+
+TEST(Common, SanitizeRValueIndex)
+{
+    EXPECT_EQ(0, Text::sanitize_index(-24, 24));
+    EXPECT_EQ(23, Text::sanitize_index(-1, 24));
+    EXPECT_EQ(1, Text::sanitize_index(1, 24));
+    EXPECT_EQ(23, Text::sanitize_index(23, 24));
+    EXPECT_EQ(24, Text::sanitize_index(24, 24));
+    EXPECT_EQ(Text::End, Text::sanitize_index(25, 24));
+}
+
 TEST(Common, IntViewToVector)
 {
     std::basic_string<int> data{1, 2, 3, 1, 1, 2, 3, 1, 4, 1};
