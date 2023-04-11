@@ -150,6 +150,50 @@ TEST(Split, LongDelimiter)
     EXPECT_EQ(result_keep, expected);
 }
 
+TEST(Split, Blocks)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    auto result_keep = Text::split(simple, "", Text::SplitBehavior::KeepEmpty, Text::Start, Text::End, 5);
+    auto expected = std::vector<std::string_view>{"simpl"sv, "e str"sv, "ing w"sv, "ith w"sv, "ords"sv};
+    EXPECT_EQ(result_keep, expected);
+}
+
+TEST(Split, CaseSensitivity)
+{
+    using namespace std::literals;
+    std::string simple("simple String with words");
+    auto result_keep = Text::split(simple, "s", Text::SplitBehavior::KeepEmpty, Text::Start, Text::End, Text::Step,
+                                   Text::Case::Insensitive);
+    auto result_drop = Text::split(simple, "s", Text::SplitBehavior::DropEmpty, Text::Start, Text::End, Text::Step,
+                                   Text::Case::Insensitive);
+    auto expected_keep = std::vector<std::string_view>{""sv, "imple "sv, "tring with word"sv, ""sv};
+    auto expected_drop = std::vector<std::string_view>{"imple "sv, "tring with word"sv};
+    EXPECT_EQ(result_keep, expected_keep);
+    EXPECT_EQ(result_drop, expected_drop);
+}
+
+TEST(Split, WithSteps)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    auto result_keep = Text::split(simple, "s", Text::SplitBehavior::KeepEmpty, 1, Text::End, 2);
+    auto result_drop = Text::split(simple, "s", Text::SplitBehavior::DropEmpty, 1, Text::End, 2);
+    auto expected_keep = std::vector<std::string_view>{"simple "sv, "tring with word"sv, ""sv};
+    auto expected_drop = std::vector<std::string_view>{"simple "sv, "tring with word"sv};
+    EXPECT_EQ(result_keep, expected_keep);
+    EXPECT_EQ(result_drop, expected_drop);
+}
+
+TEST(Split, IntVector)
+{
+    std::vector<int> data{1, 2, 3, 1, 1, 2, 3, 1, 4, 1};
+    auto result_keep = Text::split(data, 1, Text::SplitBehavior::KeepEmpty);
+    auto result_drop = Text::split(data, 1, Text::SplitBehavior::DropEmpty);
+    EXPECT_EQ(result_keep.size(), 3 + 3);
+    EXPECT_EQ(result_drop.size(), 3);
+}
+
 TEST(SplitIf, ValueLargerThan)
 {
     using namespace std::literals;
@@ -176,6 +220,16 @@ TEST(SplitIf, OutOfBoundsStart)
     auto result = Text::split_if(
         simple_sv, [](auto ch) { return ch > 'u'; }, Text::SplitBehavior::KeepEmpty, 100);
     EXPECT_EQ(result.size(), 1);
+}
+
+TEST(SplitIf, WithSteps)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    auto result_keep = Text::split_if(
+        simple, [](auto ch) { return ch > 'u'; }, Text::SplitBehavior::KeepEmpty, 1, Text::End, 2);
+    auto expected = std::vector<std::string_view>{"simple string with "sv, "ords"sv};
+    EXPECT_EQ(result_keep, expected);
 }
 
 TEST(SplitAny, SimpleWithView)
@@ -254,11 +308,28 @@ TEST(SplitAny, MultipleDelimiters)
     EXPECT_EQ(result_drop.size(), 7);
 }
 
-TEST(Split, IntVector)
+TEST(SplitAny, CaseSensitivity)
 {
-    std::vector<int> data{1, 2, 3, 1, 1, 2, 3, 1, 4, 1};
-    auto result_keep = Text::split(data, 1, Text::SplitBehavior::KeepEmpty);
-    auto result_drop = Text::split(data, 1, Text::SplitBehavior::DropEmpty);
-    EXPECT_EQ(result_keep.size(), 3 + 3);
-    EXPECT_EQ(result_drop.size(), 3);
+    using namespace std::literals;
+    std::string simple("simple String with words");
+    auto result_keep = Text::split_any(simple, "Sw", Text::SplitBehavior::KeepEmpty, Text::Start, Text::End, Text::Step,
+                                       Text::Case::Insensitive);
+    auto result_drop = Text::split_any(simple, "Sw", Text::SplitBehavior::DropEmpty, Text::Start, Text::End, Text::Step,
+                                       Text::Case::Insensitive);
+    auto expected_keep = std::vector<std::string_view>{""sv, "imple "sv, "tring "sv, "ith "sv, "ord"sv, ""sv};
+    auto expected_drop = std::vector<std::string_view>{"imple "sv, "tring "sv, "ith "sv, "ord"sv};
+    EXPECT_EQ(result_keep, expected_keep);
+    EXPECT_EQ(result_drop, expected_drop);
+}
+
+TEST(SplitAny, WithSteps)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    auto result_keep = Text::split_any(simple, "s", Text::SplitBehavior::KeepEmpty, 1, Text::End, 2);
+    auto result_drop = Text::split_any(simple, "s", Text::SplitBehavior::DropEmpty, 1, Text::End, 2);
+    auto expected_keep = std::vector<std::string_view>{"simple "sv, "tring with word"sv, ""sv};
+    auto expected_drop = std::vector<std::string_view>{"simple "sv, "tring with word"sv};
+    EXPECT_EQ(result_keep, expected_keep);
+    EXPECT_EQ(result_drop, expected_drop);
 }

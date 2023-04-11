@@ -47,6 +47,24 @@ TEST(Replace, SimpleWithViewsAndStart)
     EXPECT_EQ(simple, "simple string_with_words"s);
 }
 
+TEST(Replace, CaseInsensitive)
+{
+    using namespace std::literals;
+    std::string simple("simple String with words");
+    auto result = Text::replace(simple, "s"sv, "_"sv, Text::Start, Text::End, Text::Step, Text::Case::Insensitive);
+    EXPECT_EQ(result, 3);
+    EXPECT_EQ(simple, "_imple _tring with word_"s);
+}
+
+TEST(Replace, WithSteps)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    auto result = Text::replace(simple, "s"sv, "_"sv, 1, Text::End, 2);
+    EXPECT_EQ(result, 2);
+    EXPECT_EQ(simple, "simple _tring with word_"s);
+}
+
 TEST(ReplaceIf, ValueLargerThan)
 {
     using namespace std::literals;
@@ -77,6 +95,16 @@ TEST(ReplaceIf, OutOfBoundsStart)
     EXPECT_EQ(simple, "simple string with words");
 }
 
+TEST(ReplaceIf, WithSteps)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    auto result = Text::replace_if(
+        simple, [](auto ch) { return ch > 'u'; }, "_"sv, Text::Start, Text::End, 2);
+    EXPECT_EQ(result, 1);
+    EXPECT_EQ(simple, "simple string _ith words"s);
+}
+
 TEST(ReplaceAny, ValueLargerThan)
 {
     using namespace std::literals;
@@ -102,4 +130,13 @@ TEST(ReplaceAny, OutOfBoundsStart)
     auto result = Text::replace_any(simple, "tg"sv, "_"sv, 100);
     EXPECT_EQ(result, 0);
     EXPECT_EQ(simple, "simple string with words");
+}
+
+TEST(ReplaceAny, WithSteps)
+{
+    using namespace std::literals;
+    std::string simple("simple string with words");
+    auto result = Text::replace_any(simple, "sw"sv, "_"sv, 1, Text::End, 2);
+    EXPECT_EQ(result, 3);
+    EXPECT_EQ(simple, "simple _tring with _ord_"s);
 }

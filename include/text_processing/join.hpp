@@ -3,11 +3,11 @@
 #include "common.hpp"
 
 namespace Text {
-template <typename TextSrc, typename DelimSrc, typename TextT = container_type_t<TextSrc>,
-          typename DelimT = container_type_t<DelimSrc>, std::enable_if_t<std::is_same_v<TextT, DelimT>, int> = 0>
+template <typename TextSrc, typename DelimSrc>
+    requires CanBeDelimiterOf<DelimSrc, TextSrc>
 auto join(const std::vector<TextSrc>& views, DelimSrc d)
 {
-    std::basic_string<TextT> result;
+    std::basic_string<container_type_t<TextSrc>> result;
     if (views.empty())
         return result;
 
