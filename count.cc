@@ -44,12 +44,53 @@ TEST(Count, SimpleWithCustomTypeChar)
     EXPECT_EQ(result, 1);
 }
 
+TEST(Count, SimpleTestBoundsImplicit)
+{
+    using namespace std::literals;
+    auto simple_sv = "simple string with words"sv;
+    auto result = Text::count(simple_sv, "s");
+    EXPECT_EQ(result, 3);
+}
+
+TEST(Count, SimpleTestBoundsExplicit)
+{
+    using namespace std::literals;
+    auto simple_sv = "simple string with words"sv;
+    auto result = Text::count(simple_sv, "s", Text::Start, Text::End);
+    EXPECT_EQ(result, 3);
+}
+
+TEST(Count, CaseInsensitive)
+{
+    using namespace std::literals;
+    auto simple_sv = "simple String with words"sv;
+    auto result = Text::count(simple_sv, "S", Text::Start, Text::End, Text::Step, Text::Case::Insensitive);
+    EXPECT_EQ(result, 3);
+}
+
+TEST(Count, WithSteps)
+{
+    using namespace std::literals;
+    auto simple_sv = "simple string with words"sv;
+    auto result = Text::count(simple_sv, "s", Text::Start, Text::End, 2);
+    EXPECT_EQ(result, 1);
+}
+
 TEST(CountIf, LargerThanValue)
 {
     using namespace std::literals;
     auto simple_sv = "simple string with words"sv;
     auto result = Text::count_if(simple_sv, [](auto ch) { return ch > 'u'; });
     EXPECT_EQ(result, 2);
+}
+
+TEST(CountIf, WithSteps)
+{
+    using namespace std::literals;
+    auto simple_sv = "simple string with words"sv;
+    auto result = Text::count_if(
+        simple_sv, [](auto ch) { return ch > 'u'; }, Text::Start, Text::End, 2);
+    EXPECT_EQ(result, 1);
 }
 
 TEST(CountAny, SimpleWithView)
@@ -65,10 +106,7 @@ TEST(CountAny, SimpleWithCustomType)
     struct MyType
     {
         int val;
-        bool operator<(const MyType& arg) const
-        {
-            return val < arg.val;
-        }
+        auto operator<=>(const MyType&) const = default;
     };
 
     std::vector<MyType> simple{{0}, {1}, {2}, {1337}};
@@ -77,18 +115,18 @@ TEST(CountAny, SimpleWithCustomType)
     EXPECT_EQ(result, 3);
 }
 
-TEST(Count, SimpleTestBoundsImplicit)
+TEST(CountAny, CaseInsensitive)
 {
     using namespace std::literals;
-    auto simple_sv = "simple string with words"sv;
-    auto result = Text::count(simple_sv, "s");
-    EXPECT_EQ(result, 3);
+    auto simple_sv = "simple String With words"sv;
+    auto result = Text::count_any(simple_sv, "Sw", Text::Start, Text::End, Text::Step, Text::Case::Insensitive);
+    EXPECT_EQ(result, 5);
 }
 
-TEST(Count, SimpleTestBoundsExplicit)
+TEST(CountAny, WithSteps)
 {
     using namespace std::literals;
     auto simple_sv = "simple string with words"sv;
-    auto result = Text::count(simple_sv, "s", Text::Start, Text::End);
-    EXPECT_EQ(result, 3);
+    auto result = Text::count_any(simple_sv, "sw", Text::Start, Text::End, 2);
+    EXPECT_EQ(result, 2);
 }

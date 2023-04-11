@@ -50,15 +50,49 @@ struct container_type<T>
 {
     using value_type = typename std::remove_reference_t<T>::value_type;
 };
+
+template <typename T>
+concept RegularChar = (std::same_as<std::remove_cvref_t<T>, char> || std::same_as<std::remove_cvref_t<T>, wchar_t>);
+
+template <typename T>
+inline T caseless(const T& val)
+{
+    return val;
+}
+
+template <RegularChar T>
+inline T caseless(const T& val)
+{
+    return val >= 'A' && val <= 'Z' ? val + ('a' - 'A') : val;
+}
+
+template <typename T>
+bool caseless_compare(const T& lhs, const T& rhs)
+{
+    return caseless(lhs) == caseless(rhs);
+}
+
 } // namespace detail
 
 template <typename T>
 using container_type_t = typename detail::container_type<T>::value_type;
 
+template <class D, class T>
+concept CanBeDelimiterOf = std::same_as<container_type_t<D>, container_type_t<T>>;
+
+template <class T, class U>
+concept SameDataType = std::same_as<container_type_t<T>, container_type_t<U>>;
+
 namespace Text {
 constexpr int Start = 0;
 constexpr int End = std::numeric_limits<int>::max();
 constexpr int Step = 1;
+
+enum class Case
+{
+    Sensitive,
+    Insensitive,
+};
 
 template <typename T>
 auto to_vector(const std::basic_string_view<T>& container)
@@ -94,11 +128,19 @@ T* strncpy(T* dest, const T* src, size_t n)
 }
 
 template <typename T>
-constexpr bool are_equal(const T* lhs, const T* rhs, size_t len)
+constexpr bool are_equal(const T* lhs, const T* rhs, size_t len, Case sensitivity)
 {
     while (len-- > 0)
-        if (*lhs++ != *rhs++)
-            return false;
+        if (sensitivity == Case::Sensitive)
+        {
+            if (*lhs++ != *rhs++)
+                return false;
+        }
+        else
+        {
+            if (!detail::caseless_compare<T>(*lhs++, *rhs++))
+                return false;
+        }
     return true;
 }
 
@@ -118,7 +160,7 @@ constexpr Value sanitize_index(T&& index, size_t text_size)
     if (index < Value{0})
         index = index + static_cast<Value>(text_size);
     else if (index == Text::End)
-        index = text_size;
+        index = static_cast<Value>(text_size);
 
     if (text_size == 0 || index != clamp(index, Value{0}, static_cast<Value>(text_size)))
         return Text::End;
@@ -184,20 +226,30 @@ template <typename E>
 struct Delimiters
 {
     std::set<E> delimiters;
-    explicit constexpr Delimiters(const E* str)
-        : delimiters{str, str + strlen(str)}
+    explicit constexpr Delimiters(const E* str, Case sensitivity = Case::Sensitive)
+        : delimiters{init_delimiters(str, str + strlen(str), sensitivity)}
     {}
     template <typename T>
-    explicit constexpr Delimiters(const T& container)
-        : delimiters{container.cbegin(), container.cend()}
+    explicit constexpr Delimiters(const T& container, Case sensitivity = Case::Sensitive)
+        : delimiters{init_delimiters(container.cbegin(), container.cend(), sensitivity)}
     {}
 
-    constexpr bool contains(E ch) const
+    std::set<E> init_delimiters(auto begin, auto end, Case sensitivity)
     {
-        return delimiters.contains(ch);
+        if (sensitivity == Case::Sensitive)
+            return std::set<E>(begin, end);
+        std::set<E> insensitive;
+        for (; begin != end; ++begin)
+            insensitive.insert(detail::caseless(*begin));
+        return insensitive;
+    }
+
+    constexpr bool contains(E ch, Case sensitivity = Case::Sensitive) const
+    {
+        return delimiters.contains(sensitivity == Case::Sensitive ? ch : detail::caseless(ch));
     }
 };
 
 template <DataContainer T>
-Delimiters(const T& container) -> Delimiters<typename std::remove_reference_t<T>::value_type>;
+Delimiters(const T& container, Case c) -> Delimiters<typename std::remove_reference_t<T>::value_type>;
 } // namespace Text
