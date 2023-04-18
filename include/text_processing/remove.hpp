@@ -62,9 +62,10 @@ int remove_if(std::basic_string<TextT>& t, Predicate pred, int start = Start, in
 }
 
 template <typename TextSrc, typename Predicate, typename TextT = container_type_t<TextSrc>>
-[[nodiscard]] auto removed_if(const TextSrc& t, Predicate pred, int start = 0) -> std::basic_string<TextT>
+[[nodiscard]] auto removed_if(const TextSrc& t, Predicate pred, int start = Start, int end = End, int step = Step)
+    -> std::basic_string<TextT>
 {
-    return remove_if_impl(t, pred, start).text;
+    return remove_if_impl(t, pred, start, end, step).text;
 }
 
 template <typename TextSrc, typename NeedleSrc, typename TextT = container_type_t<TextSrc>>
