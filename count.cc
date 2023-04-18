@@ -10,6 +10,14 @@ TEST(Count, SimpleWithViewAndShortNeedle)
     EXPECT_EQ(result, 3);
 }
 
+TEST(Count, SimpleWithViewAndCharNeedle)
+{
+    using namespace std::literals;
+    auto simple_sv = "simple string with words"sv;
+    auto result = Text::count(simple_sv, ' ');
+    EXPECT_EQ(result, 3);
+}
+
 TEST(Count, SimpleWithViewAndLongerNeedle)
 {
     using namespace std::literals;

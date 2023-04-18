@@ -59,7 +59,7 @@ int find_if_impl(const TextSrc& t, Predicate pred, int start, int end, int step)
     if (sanitize_index(start, text.length) == End || sanitize_index(end, text.length) == End)
         return End;
 
-    auto current = step < 0 ? text.ptr + end - 1 : text.ptr + start;
+    const auto* current = step < 0 ? text.ptr + end - 1 : text.ptr + start;
     while (current < text.ptr + text.length && current >= text.ptr)
     {
         if (!pred(*current))

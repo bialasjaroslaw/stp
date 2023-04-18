@@ -22,9 +22,12 @@ void count_needle(const uint8_t* Data, size_t Size)
         {
             for (int end_idx = -text_size; end_idx <= text_size; ++end_idx)
             {
-                Text::count(data, needle, start_idx, end_idx);
-                Text::count_any(data, needle, start_idx, end_idx);
-                Text::count_if(data, pred, start_idx, end_idx);
+                for (int step = -text_size; step <= text_size; ++step)
+                {
+                    Text::count(data, needle, start_idx, end_idx);
+                    Text::count_any(data, needle, start_idx, end_idx);
+                    Text::count_if(data, pred, start_idx, end_idx);
+                }
             }
         }
     }
@@ -32,6 +35,7 @@ void count_needle(const uint8_t* Data, size_t Size)
 
 void find_needle(const uint8_t* Data, size_t Size)
 {
+    const auto step_limit = 5;
     auto pred = [delim = *Data](auto ch) { return ch > delim; };
     ++Data;
     --Size;
@@ -41,14 +45,14 @@ void find_needle(const uint8_t* Data, size_t Size)
         const std::basic_string_view<uint8_t> needle(Data + text_size, Size - text_size);
         for (int start_idx = -text_size; start_idx <= text_size; ++start_idx)
         {
-            for (int step = -text_size; step <= text_size; ++step)
+            for (int step = -step_limit; step <= step_limit; ++step)
             {
-                Text::find(data, needle, start_idx, step);
-                Text::find_any(data, needle, start_idx, step);
-                Text::find_if(data, pred, start_idx, step);
-                Text::rfind(data, needle, start_idx, step);
-                Text::rfind_any(data, needle, start_idx, step);
-                Text::rfind_if(data, pred, start_idx, step);
+                Text::find(data, needle, start_idx, Text::End, step);
+                Text::find_any(data, needle, start_idx, Text::End, step);
+                Text::find_if(data, pred, start_idx, Text::End, step);
+                Text::rfind(data, needle, start_idx, Text::End, step);
+                Text::rfind_any(data, needle, start_idx, Text::End, step);
+                Text::rfind_if(data, pred, start_idx, Text::End, step);
             }
         }
     }
@@ -67,6 +71,7 @@ void join_needle(const uint8_t* Data, size_t Size)
 
 void remove_needle(const uint8_t* Data, size_t Size)
 {
+    const auto step_limit = 5;
     auto pred = [delim = *Data](auto ch) { return ch > delim; };
     ++Data;
     --Size;
@@ -81,30 +86,25 @@ void remove_needle(const uint8_t* Data, size_t Size)
         };
         for (int start_idx = -text_size; start_idx <= text_size; ++start_idx)
         {
-            Text::remove(data, needle, start_idx);
-            Text::removed(data, needle, start_idx);
-            reset();
-            Text::remove_any(data, needle, start_idx);
-            Text::removed_any(data, needle, start_idx);
-            reset();
-            Text::remove_if(data, pred, start_idx);
-            Text::removed_if(data, pred, start_idx);
-            reset();
-            Text::rremove(data, needle, start_idx);
-            Text::rremoved(data, needle, start_idx);
-            reset();
-            Text::rremove_any(data, needle, start_idx);
-            Text::rremoved_any(data, needle, start_idx);
-            reset();
-            Text::rremove_if(data, pred, start_idx);
-            Text::rremoved_if(data, pred, start_idx);
-            reset();
+            for (int step = -step_limit; step <= step_limit; ++step)
+            {
+                Text::remove(data, needle, start_idx, Text::End, step);
+                Text::removed(data, needle, start_idx, Text::End, step);
+                reset();
+                Text::remove_any(data, needle, start_idx, Text::End, step);
+                Text::removed_any(data, needle, start_idx, Text::End, step);
+                reset();
+                Text::remove_if(data, pred, start_idx, Text::End, step);
+                Text::removed_if(data, pred, start_idx, Text::End, step);
+                reset();
+            }
         }
     }
 }
 
 void replace_needle(const uint8_t* Data, size_t Size)
 {
+    const auto step_limit = 5;
     auto pred = [](auto ch) { return ch > 'p'; };
     for (int text_size = 1; text_size < Size - 1; ++text_size)
     {
@@ -123,15 +123,18 @@ void replace_needle(const uint8_t* Data, size_t Size)
             {
                 for (int end_idx = -text_size; end_idx <= text_size; ++end_idx)
                 {
-                    Text::replace(data, needle, replace, start_idx, end_idx);
-                    Text::replaced(data, needle, replace, start_idx, end_idx);
-                    reset();
-                    Text::replace_any(data, needle, replace, start_idx, end_idx);
-                    Text::replaced_any(data, needle, replace, start_idx, end_idx);
-                    reset();
-                    Text::replace_if(data, pred, replace, start_idx, end_idx);
-                    Text::replaced_if(data, pred, replace, start_idx, end_idx);
-                    reset();
+                    for (int step = -step_limit; step <= step_limit; ++step)
+                    {
+                        Text::replace(data, needle, replace, start_idx, end_idx, step);
+                        Text::replaced(data, needle, replace, start_idx, end_idx, step);
+                        reset();
+                        Text::replace_any(data, needle, replace, start_idx, end_idx, step);
+                        Text::replaced_any(data, needle, replace, start_idx, end_idx, step);
+                        reset();
+                        Text::replace_if(data, pred, replace, start_idx, end_idx, step);
+                        Text::replaced_if(data, pred, replace, start_idx, end_idx, step);
+                        reset();
+                    }
                 }
             }
         }
@@ -140,6 +143,7 @@ void replace_needle(const uint8_t* Data, size_t Size)
 
 void split_needle(const uint8_t* Data, size_t Size)
 {
+    const auto step_limit = 5;
     auto pred = [delim = *Data](auto ch) { return ch > delim; };
     ++Data;
     --Size;
@@ -152,12 +156,15 @@ void split_needle(const uint8_t* Data, size_t Size)
         {
             for (int end_idx = -text_size; end_idx <= text_size; ++end_idx)
             {
-                Text::split(data, needle, Text::SplitBehavior::KeepEmpty, start_idx, end_idx);
-                Text::split_any(data, needle, Text::SplitBehavior::KeepEmpty, start_idx, end_idx);
-                Text::split_if(data, pred, Text::SplitBehavior::KeepEmpty, start_idx, end_idx);
-                Text::split(data, needle, Text::SplitBehavior::DropEmpty, start_idx, end_idx);
-                Text::split_any(data, needle, Text::SplitBehavior::DropEmpty, start_idx, end_idx);
-                Text::split_if(data, pred, Text::SplitBehavior::DropEmpty, start_idx, end_idx);
+                for (int step = -step_limit; step <= step_limit; ++step)
+                {
+                    Text::split(data, needle, Text::SplitBehavior::KeepEmpty, start_idx, end_idx, step);
+                    Text::split_any(data, needle, Text::SplitBehavior::KeepEmpty, start_idx, end_idx, step);
+                    Text::split_if(data, pred, Text::SplitBehavior::KeepEmpty, start_idx, end_idx, step);
+                    Text::split(data, needle, Text::SplitBehavior::DropEmpty, start_idx, end_idx, step);
+                    Text::split_any(data, needle, Text::SplitBehavior::DropEmpty, start_idx, end_idx, step);
+                    Text::split_if(data, pred, Text::SplitBehavior::DropEmpty, start_idx, end_idx, step);
+                }
             }
         }
     }
@@ -175,8 +182,6 @@ void sub_fuzzing(const uint8_t* Data, size_t Size)
     }
 }
 
-// Fuzzer that attempts to invoke undefined behavior for signed integer overflow
-// cppcheck-suppress unusedFunction symbolName=LLVMFuzzerTestOneInput
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size)
 {
     if (Size < 2)
