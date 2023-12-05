@@ -48,7 +48,7 @@ jobs:
       if: ${{ matrix.compiler == 'llvm' }}
       uses: egor-tensin/setup-clang@v1
       with:
-        version: latest
+        version: 13
         platform: x64
 
     - name: Configure CMake
