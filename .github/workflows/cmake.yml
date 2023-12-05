@@ -3,6 +3,7 @@ name: CMake
 on:
   push:
     tags:
+      - v*
     branches:
       - master
       - development
@@ -43,12 +44,17 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - uses: seanmiddleditch/gha-setup-ninja@master
-
+    - name: Workaround for Clang
+      # workaround for broken clang on ubuntu runner until https://github.com/actions/runner-images/issues/8659 get fixed
+      if: ${{ matrix.compiler == 'llvm' }}
+      uses: mjp41/workaround8649@7929373c0fe5caf844d8115adccef39e3b5362e7
+      with:
+        os: ${{ matrix.os }} 
     - name: Set up Clang
       if: ${{ matrix.compiler == 'llvm' }}
       uses: egor-tensin/setup-clang@v1
       with:
-        version: latest
+        version: 14
         platform: x64
 
     - name: Configure CMake
