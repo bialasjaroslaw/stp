@@ -1,4 +1,4 @@
-#include "common.hpp"
+#include <text_processing/common.hpp>
 
 #include <gtest/gtest.h>
 

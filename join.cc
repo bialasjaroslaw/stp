@@ -1,4 +1,4 @@
-#include "join.hpp"
+#include <text_processing/join.hpp>
 
 #include <gtest/gtest.h>
 
