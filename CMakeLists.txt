@@ -32,7 +32,8 @@ if(DEVELOPER_BUILD)
     )
 endif()
 
-add_library(text_processing INTERFACE 
+add_library(text_processing INTERFACE)
+target_sources(text_processing INTERFACE
     include/text_processing/common.hpp
     include/text_processing/count.hpp
     include/text_processing/find.hpp
