@@ -1,4 +1,4 @@
-#include "remove.hpp"
+#include <text_processing/remove.hpp>
 
 #include <gtest/gtest.h>
 

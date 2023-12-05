@@ -1,4 +1,4 @@
-#include "split.hpp"
+#include <text_processing/split.hpp>
 
 #include <gtest/gtest.h>
 

@@ -43,7 +43,7 @@ target_sources(text_processing INTERFACE
     include/text_processing/split.hpp
     include/text_processing/sub.hpp
 )
-target_include_directories(text_processing INTERFACE include/text_processing)
+target_include_directories(text_processing INTERFACE include)
 
 if (TEXT_PROCESSING_ENABLE_TESTS AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     message(STATUS "Compiler id is ${CMAKE_CXX_COMPILER_ID}")
