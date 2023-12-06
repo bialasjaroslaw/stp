@@ -110,6 +110,16 @@ auto to_vector(const std::vector<std::basic_string_view<T>>& container)
     return result;
 }
 
+template <typename T>
+auto to_string_vector(const std::vector<std::basic_string_view<T>>& container)
+{
+    std::vector<std::basic_string<T>> result;
+    result.reserve(container.size());
+    for (const auto& elem : container)
+        result.emplace_back(std::basic_string<T>(elem.cbegin(), elem.cend()));
+    return result;
+}
+
 template <typename E>
 constexpr std::size_t strlen(const E* start)
 {
