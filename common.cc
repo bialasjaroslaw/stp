@@ -32,7 +32,7 @@ TEST(Common, StringViewVectorToStringVector)
 {
     std::string sample{"sample string with words"};
     std::vector<std::string_view> chunks{
-        {sample.data(), 6}, {sample.data() + 7, 6}, {sample.data() + 14, 4}, {sample.data() + 19, 5}
+        {sample.data(), 6}, {sample.data() + 7, 6}, {sample.data() + 14, 4}, {sample.data() + 19, 5}, {nullptr, 0}
     };
     auto str_chunks = Text::to_string_vector(chunks);
     ASSERT_EQ(chunks.size(), str_chunks.size());
