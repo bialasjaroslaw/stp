@@ -28,6 +28,18 @@ TEST(Common, IntViewToVector)
         EXPECT_EQ(data[idx], transformed[idx]);
 }
 
+TEST(Common, StringViewVectorToStringVector)
+{
+    std::string sample{"sample string with words"};
+    std::vector<std::string_view> chunks{
+        {sample.data(), 6}, {sample.data() + 7, 6}, {sample.data() + 14, 4}, {sample.data() + 19, 5}
+    };
+    auto str_chunks = Text::to_string_vector(chunks);
+    ASSERT_EQ(chunks.size(), str_chunks.size());
+    for (size_t idx = 0; idx < chunks.size(); ++idx)
+        EXPECT_EQ(chunks[idx], str_chunks[idx]);
+}
+
 TEST(Common, VectorIntViewToVectorOfVectors)
 {
     std::basic_string<int> data{1, 2, 3, 1, 1, 2, 3, 1, 4, 1};
