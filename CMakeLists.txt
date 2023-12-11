@@ -1,36 +1,24 @@
 cmake_minimum_required(VERSION 3.14)
 
-# Add project_options v0.20.0
-# https://github.com/cpp-best-practices/project_options
-include(FetchContent)
-FetchContent_Declare(_project_options URL https://github.com/aminya/project_options/archive/refs/tags/v0.20.0.zip)
-FetchContent_MakeAvailable(_project_options)
-include(${_project_options_SOURCE_DIR}/Index.cmake)
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
+    cmake_policy(SET CMP0135 NEW)
+endif()
 
 project(text_processing VERSION 0.2 LANGUAGES CXX)
 option(DEVELOPER_BUILD "Enable developer mode" OFF)
 option(TEXT_PROCESSING_ENABLE_TESTS "Enable test build" ON)
 
-set(ENABLE_SANITIZER_ADDRESS "ENABLE_SANITIZER_ADDRESS")
-if(MSVC)
-    string(FIND "$ENV{PATH}" "$ENV{VSINSTALLDIR}" index_of_vs_install_dir)
-    if(NOT "${index_of_vs_install_dir}" STREQUAL "-1")
-        set(ENABLE_SANITIZER_ADDRESS "")
-    endif()
-endif()
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
 
-if(DEVELOPER_BUILD)
-    include(${_project_options_SOURCE_DIR}/src/DynamicProjectOptions.cmake)
-    dynamic_project_options(
-	ENABLE_CACHE
-	ENABLE_CPPCHECK
-	ENABLE_CLANG_TIDY
-	${ENABLE_SANITIZER_ADDRESS}
-	ENABLE_SANITIZER_LEAK
-	ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
-	ENABLE_COVERAGE
-    )
-endif()
+include(FetchContent)
+
+FetchContent_Declare(
+    _project_options
+    URL https://github.com/aminya/project_options/archive/refs/tags/v0.33.0.zip
+)
+FetchContent_MakeAvailable(_project_options)
 
 add_library(text_processing INTERFACE)
 target_sources(text_processing INTERFACE
@@ -45,48 +33,101 @@ target_sources(text_processing INTERFACE
 )
 target_include_directories(text_processing INTERFACE include)
 
-if (TEXT_PROCESSING_ENABLE_TESTS AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    message(STATUS "Compiler id is ${CMAKE_CXX_COMPILER_ID}")
-    option(TEXT_PROCESSING_ENABLE_FUZZING "Build fuzzing tests" ON)
+if(DEVELOPER_BUILD)
+    set(ENABLE_CPPCHECK "ENABLE_CPPCHECK")
+    if(NOT CXX_CPPCHECK)
+        set(ENABLE_CPPCHECK "")
+    endif()
+
+    check_sanitizers_support(
+        ENABLE_SANITIZER_ADDRESS
+        ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
+        ENABLE_SANITIZER_LEAK
+        ENABLE_SANITIZER_THREAD
+        ENABLE_SANITIZER_MEMORY
+    )
+
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(ENABLE_GCC_ANALYZER "ENABLE_GCC_ANALYZER")
+        set(GCC_WARNINGS "GCC_WARNINGS")
+        set(ENABLE_COVERAGE "ENABLE_COVERAGE")
+        set(ENABLE_CONTROL_FLOW_PROTECTION "ENABLE_CONTROL_FLOW_PROTECTION")
+        set(ENABLE_STACK_PROTECTION "ENABLE_STACK_PROTECTION")
+        set(ENABLE_OVERFLOW_PROTECTION "ENABLE_OVERFLOW_PROTECTION")
+        set(WARNINGS_AS_ERRORS "WARNINGS_AS_ERRORS")
+    else()
+        set(ENABLE_GCC_ANALYZER "")
+        set(GCC_WARNINGS "")
+        set(ENABLE_SANITIZER_ADDRESS "")
+        set(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR "")
+        set(ENABLE_SANITIZER_LEAK "")
+        set(ENABLE_SANITIZER_THREAD "")
+        set(ENABLE_SANITIZER_MEMORY "")
+    endif()
+
+    include(${_project_options_SOURCE_DIR}/Index.cmake)
+    include(${_project_options_SOURCE_DIR}/src/DynamicProjectOptions.cmake)
+    project_options(
+        PREFIX ${PROJECT_NAME}
+        ENABLE_CACHE
+        ${ENABLE_CPPCHECK}
+        ${ENABLE_CLANG_TIDY}
+        ${ENABLE_SANITIZER_ADDRESS}
+        ${ENABLE_SANITIZER_LEAK}
+        ${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}
+        ${ENABLE_COVERAGE}
+        ${ENABLE_CONTROL_FLOW_PROTECTION}
+        ${ENABLE_STACK_PROTECTION}
+        ${ENABLE_OVERFLOW_PROTECTION}
+        ${WARNINGS_AS_ERRORS}
+        ${ENABLE_GCC_ANALYZER}
+        ${GCC_WARNINGS}
+    )
+
+    target_link_libraries(io_dev INTERFACE 
+        ${PROJECT_NAME}_project_options 
+        ${PROJECT_NAME}_project_warnings
+    )
 endif()
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 20)
-
 if(TEXT_PROCESSING_ENABLE_TESTS)
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        message(STATUS "Compiler id is ${CMAKE_CXX_COMPILER_ID}")
+        option(TEXT_PROCESSING_ENABLE_FUZZING "Build fuzzing tests" ON)
+    endif()
+
     include(FetchContent)
     include(CTest)
     include(GoogleTest)
 
     enable_testing()
     FetchContent_Declare(
-	googletest
-	GIT_REPOSITORY https://github.com/google/googletest.git
-	GIT_TAG        58d77fa8070e8cec2dc1ed015d66b454c8d78850 # release-1.12.1
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG        58d77fa8070e8cec2dc1ed015d66b454c8d78850 # release-1.12.1
     )
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
+
     add_executable(main 
-	common.cc
-	count.cc
-	find.cc
-	join.cc 
-	remove.cc 
-	replace.cc 
-	split.cc 
-	sub.cc
+        common.cc
+        count.cc
+        find.cc
+        join.cc 
+        remove.cc 
+        replace.cc 
+        split.cc 
+        sub.cc
     )
 
     target_link_libraries(main PRIVATE text_processing gtest_main)
     if(DEVELOPER_BUILD)
-	target_link_libraries(main PRIVATE project_options project_warnings)
-	if(TEXT_PROCESSING_ENABLE_FUZZING)
-	    message(STATUS "Fuzzing enabled")
-	    add_subdirectory(fuzzer)
-	endif()
+        target_link_libraries(main PRIVATE project_options project_warnings)
+        if(TEXT_PROCESSING_ENABLE_FUZZING)
+            message(STATUS "Fuzzing enabled")
+            add_subdirectory(fuzzer)
+        endif()
     endif()
     gtest_discover_tests(main)
-    
 endif()
