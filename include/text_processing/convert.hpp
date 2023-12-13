@@ -4,7 +4,7 @@
 
 #include <charconv>
 #include <stdexcept>
-//#include <iostream>
+#include <iostream>
 
 namespace Text {
 template <typename R, typename TextSrc>
