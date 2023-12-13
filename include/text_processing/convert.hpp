@@ -20,7 +20,7 @@ auto convert(const std::vector<TextSrc>& container)
         auto [ptr, ec] = std::from_chars(t.ptr, t.ptr + t.length, val);
         if (ec != std::errc())
             throw std::runtime_error("Invalid value passed to convert: "s + std::string(elem));
-        // std::cout << "Converting " << std::string_view(t.ptr, t.length) << "Got " << val << std::endl;
+        std::cout << "Converting " << std::string_view(t.ptr, t.length) << "Got " << val << std::endl;
         result.emplace_back(val);
     }
     return result;
