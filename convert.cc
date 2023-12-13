@@ -115,12 +115,26 @@ using namespace ::testing;
 //          HasSubstr("Invalid value passed to convert"))));
 // }
 
-TEST(Convert, VectorOfStringsToVectorOfFloats)
+TEST(Convert, StringViewOverflowInt)
 {
     using namespace std::literals;
-    auto s = "2147483648"sv;
-    int val = 13;
-    auto [ptr, ec] = std::from_chars(s.data(), s.data() + s.length(), val);
-    EXPECT_THAT(ec, std::errc::result_out_of_range);
-    EXPECT_THAT(val, 13);
+    std::string_view data = "2147483648"sv;
+    int32_t val = 12;
+    EXPECT_THAT([&](){
+        val = Text::convert<int32_t>(data); },
+    Throws<std::runtime_error>(Property(&std::runtime_error::what,
+         HasSubstr("Invalid value passed to convert"))));
+    EXPECT_THAT(val, Eq(int32_t{12}));
+}
+
+TEST(Convert, StringViewOverflowLong)
+{
+    using namespace std::literals;
+    std::string_view data = "9223372036854775808"sv;
+    int64_t val = 12;
+    EXPECT_THAT([&](){
+        val = Text::convert<int64_t>(data); },
+    Throws<std::runtime_error>(Property(&std::runtime_error::what,
+         HasSubstr("Invalid value passed to convert"))));
+    EXPECT_THAT(val, Eq(int64_t{12}));
 }
