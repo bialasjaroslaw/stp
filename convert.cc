@@ -6,6 +6,41 @@
 
 using namespace ::testing;
 
+TEST(Convert, StringToInt)
+{
+    using namespace std::literals;
+    auto result = Text::convert<int32_t>("12"s);
+    ASSERT_THAT(result, Eq(12));
+}
+
+TEST(Convert, StringViewToInt)
+{
+    using namespace std::literals;
+    auto result = Text::convert<int32_t>("12"sv);
+    ASSERT_THAT(result, Eq(12));
+}
+
+TEST(Convert, CharArrayToInt)
+{
+    using namespace std::literals;
+    auto result = Text::convert<int32_t>("12");
+    ASSERT_THAT(result, Eq(12));
+}
+
+TEST(Convert, StringToFloat)
+{
+    using namespace std::literals;
+    auto result = Text::convert<float>("12.34");
+    ASSERT_THAT(result, FloatEq(12.34));
+}
+
+TEST(Convert, StringToDouble)
+{
+    using namespace std::literals;
+    auto result = Text::convert<double>("12.34");
+    ASSERT_THAT(result, DoubleEq(12.34));
+}
+
 TEST(Convert, VectorOfStringsToVectorOfInts)
 {
     using namespace std::literals;
