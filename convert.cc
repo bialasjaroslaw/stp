@@ -59,3 +59,22 @@ TEST(Convert, VectorOfStringsLongOutOfRange)
          HasSubstr("Invalid value passed to convert"))));
 
 }
+
+TEST(Convert, VectorOfStringsToVectorOfFloats)
+{
+    using namespace std::literals;
+    std::vector<std::string> data{"NAN"s, "INF"s, "3.402823466e+38"s, "-3.402823466e+38"s, "1.4013e-45"};
+    auto result = Text::convert<float>(data);
+    ASSERT_THAT(result, ElementsAre(
+        IsNan(), std::numeric_limits<float>::infinity(), 3.402823466e38f, -3.402823466e38f, 1.4013e-45f));
+}
+
+TEST(Convert, VectorOfStringsToVectorOfFloatsOutOfRange)
+{
+    using namespace std::literals;
+    std::vector<std::string_view> data{"0.0f", "3.402823467e+38"s};
+    EXPECT_THAT([&data](){
+        Text::convert<float>(data); },
+    Throws<std::runtime_error>(Property(&std::runtime_error::what,
+         HasSubstr("Invalid value passed to convert"))));
+}
