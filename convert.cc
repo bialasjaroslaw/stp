@@ -61,10 +61,12 @@ TEST(Convert, VectorOfStringsIntOutOfRange)
 {
     using namespace std::literals;
     std::vector<std::string_view> data{"2147483648"s};
-    EXPECT_THAT([&data](){ 
-        Text::convert<int32_t>(data); },
+    int32_t res;
+    EXPECT_THAT([&data, &res](){ 
+        res = Text::convert<int32_t>(data); },
     Throws<std::runtime_error>(Property(&std::runtime_error::what,
          HasSubstr("Invalid value passed to convert"))));
+    ASSERT_THAT(res, Eq(2147483648LL))
 
 }
 
