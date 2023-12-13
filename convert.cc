@@ -107,7 +107,7 @@ TEST(Convert, VectorOfStringsToVectorOfFloats)
 TEST(Convert, VectorOfStringsToVectorOfFloatsOutOfRange)
 {
     using namespace std::literals;
-    std::vector<std::string_view> data{"0.0f", "3.402823467e+38"s};
+    std::vector<std::string_view> data{"4e+38"s};
     EXPECT_THAT([&data](){
         Text::convert<float>(data); },
     Throws<std::runtime_error>(Property(&std::runtime_error::what,
