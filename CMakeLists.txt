@@ -23,6 +23,7 @@ FetchContent_MakeAvailable(_project_options)
 add_library(text_processing INTERFACE)
 target_sources(text_processing INTERFACE
     include/text_processing/common.hpp
+    include/text_processing/convert.hpp
     include/text_processing/count.hpp
     include/text_processing/find.hpp
     include/text_processing/join.hpp
@@ -112,6 +113,7 @@ if(TEXT_PROCESSING_ENABLE_TESTS)
 
     add_executable(main 
         common.cc
+        convert.cc
         count.cc
         find.cc
         join.cc 
@@ -121,7 +123,7 @@ if(TEXT_PROCESSING_ENABLE_TESTS)
         sub.cc
     )
 
-    target_link_libraries(main PRIVATE text_processing gtest_main)
+    target_link_libraries(main PRIVATE text_processing gtest_main gmock)
     if(DEVELOPER_BUILD)
         target_link_libraries(main PRIVATE project_options project_warnings)
         if(TEXT_PROCESSING_ENABLE_FUZZING)
