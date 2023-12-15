@@ -60,7 +60,7 @@ TEST(Convert, StringToFloat)
 {
     using namespace std::literals;
     auto result = Text::convert<float>("12.34");
-    EXPECT_THAT(result, FloatEq(12.34));
+    EXPECT_THAT(result, FloatEq(12.34f));
 }
 
 TEST(Convert, StringToFloatOverflow)
