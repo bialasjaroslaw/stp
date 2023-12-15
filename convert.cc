@@ -6,40 +6,84 @@
 
 using namespace ::testing;
 
-// TEST(Convert, StringToInt)
-// {
-//     using namespace std::literals;
-//     auto result = Text::convert<int32_t>("12"s);
-//     ASSERT_THAT(result, Eq(12));
-// }
+TEST(Convert, StringToInt)
+{
+    using namespace std::literals;
+    auto result = Text::convert<int32_t>("12"s);
+    ASSERT_THAT(result, Eq(12));
+}
 
-// TEST(Convert, StringViewToInt)
-// {
-//     using namespace std::literals;
-//     auto result = Text::convert<int32_t>("12"sv);
-//     ASSERT_THAT(result, Eq(12));
-// }
+TEST(Convert, StringViewToInt)
+{
+    using namespace std::literals;
+    auto result = Text::convert<int32_t>("12"sv);
+    ASSERT_THAT(result, Eq(12));
+}
 
-// TEST(Convert, CharArrayToInt)
-// {
-//     using namespace std::literals;
-//     auto result = Text::convert<int32_t>("12");
-//     ASSERT_THAT(result, Eq(12));
-// }
+TEST(Convert, CharArrayToInt)
+{
+    using namespace std::literals;
+    auto result = Text::convert<int32_t>("12");
+    ASSERT_THAT(result, Eq(12));
+}
 
-// TEST(Convert, StringToFloat)
-// {
-//     using namespace std::literals;
-//     auto result = Text::convert<float>("12.34");
-//     ASSERT_THAT(result, FloatEq(12.34));
-// }
+TEST(Convert, StringToFloat)
+{
+    using namespace std::literals;
+    auto result = Text::convert<float>("12.34");
+    ASSERT_THAT(result, FloatEq(12.34));
+}
 
-// TEST(Convert, StringToDouble)
-// {
-//     using namespace std::literals;
-//     auto result = Text::convert<double>("12.34");
-//     ASSERT_THAT(result, DoubleEq(12.34));
-// }
+TEST(Convert, StringToDouble)
+{
+    using namespace std::literals;
+    auto result = Text::convert<double>("12.34");
+    ASSERT_THAT(result, DoubleEq(12.34));
+}
+
+TEST(Convert, StringToIntOverflow)
+{
+    using namespace std::literals;
+    EXPECT_THAT([](){
+        Text::convert<int32_t>("2147483648"s); },
+        Throws<std::runtime_error>(Property(&std::runtime_error::what,
+            HasSubstr("Invalid value passed to convert"))
+        )
+    );
+}
+
+TEST(Convert, StringToLongOverflow)
+{
+    using namespace std::literals;
+    EXPECT_THAT([](){
+        Text::convert<int64_t>("9223372036854775808"s); },
+        Throws<std::runtime_error>(Property(&std::runtime_error::what,
+            HasSubstr("Invalid value passed to convert"))
+        )
+    );
+}
+
+TEST(Convert, StringToFloatOverflow)
+{
+    using namespace std::literals;
+    EXPECT_THAT([](){
+        Text::convert<float>("4e+38"s); },
+        Throws<std::runtime_error>(Property(&std::runtime_error::what,
+            HasSubstr("Invalid value passed to convert"))
+        )
+    );
+}
+
+TEST(Convert, StringToDoubleOverflow)
+{
+    using namespace std::literals;
+    EXPECT_THAT([](){
+        Text::convert<double>("2e+308"s); },
+        Throws<std::runtime_error>(Property(&std::runtime_error::what,
+            HasSubstr("Invalid value passed to convert"))
+        )
+    );
+}
 
 // TEST(Convert, VectorOfStringsToVectorOfInts)
 // {
