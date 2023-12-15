@@ -167,3 +167,24 @@ TEST(Convert, VectorOfStringsToVectorOfFloatsOutOfRange)
     );
 }
 
+TEST(Convert, VectorOfStringsToVectorOfDoubles)
+{
+    using namespace std::literals;
+    std::vector<std::string> data{"NAN"s, "INF"s, "1.79769e+308"s, "-1.79769e+308"s, "4.94066e-324"};
+    auto result = Text::convert<double>(data);
+    EXPECT_THAT(result, ElementsAre(
+        IsNan(), std::numeric_limits<double>::infinity(), 1.79769e308, -1.79769e+308, 4.94066e-324));
+}
+
+TEST(Convert, VectorOfStringsToVectorOfDoublesOutOfRange)
+{
+    using namespace std::literals;
+
+    EXPECT_THAT([](){
+        Text::convert<double>(std::vector<std::string_view>{"12.34"sv, "2e+308"sv});},
+        Throws<std::runtime_error>(Property(&std::runtime_error::what,
+            HasSubstr("Invalid value passed to convert"))
+        )
+    );
+}
+
