@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <cstring>
 #include <text_processing/count.hpp>
 #include <text_processing/find.hpp>
