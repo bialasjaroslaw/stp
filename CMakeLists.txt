@@ -4,21 +4,13 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
     cmake_policy(SET CMP0135 NEW)
 endif()
 
-project(text_processing VERSION 0.2 LANGUAGES CXX)
+project(text_processing VERSION 0.2 LANGUAGES CXX C)
 option(DEVELOPER_BUILD "Enable developer mode" OFF)
 option(TEXT_PROCESSING_ENABLE_TESTS "Enable test build" ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
-
-include(FetchContent)
-
-FetchContent_Declare(
-    _project_options
-    URL https://github.com/aminya/project_options/archive/refs/tags/v0.33.0.zip
-)
-FetchContent_MakeAvailable(_project_options)
 
 add_library(text_processing INTERFACE)
 target_sources(text_processing INTERFACE
@@ -35,6 +27,13 @@ target_sources(text_processing INTERFACE
 target_include_directories(text_processing INTERFACE include)
 
 if(DEVELOPER_BUILD)
+    include(FetchContent)
+    FetchContent_Declare(
+        _project_options
+        URL https://github.com/aminya/project_options/archive/refs/tags/v0.33.0.zip
+    )
+    FetchContent_MakeAvailable(_project_options)
+
     set(ENABLE_CPPCHECK "ENABLE_CPPCHECK")
     if(NOT CXX_CPPCHECK)
         set(ENABLE_CPPCHECK "")
@@ -94,7 +93,7 @@ if(DEVELOPER_BUILD)
         ${GCC_WARNINGS}
     )
 
-    target_link_libraries(io_dev INTERFACE 
+    target_link_libraries(text_processing INTERFACE 
         ${PROJECT_NAME}_project_options 
         ${PROJECT_NAME}_project_warnings
     )
@@ -134,7 +133,6 @@ if(TEXT_PROCESSING_ENABLE_TESTS)
 
     target_link_libraries(main PRIVATE text_processing gtest_main gmock)
     if(DEVELOPER_BUILD)
-        target_link_libraries(main PRIVATE project_options project_warnings)
         if(TEXT_PROCESSING_ENABLE_FUZZING)
             message(STATUS "Fuzzing enabled")
             add_subdirectory(fuzzer)
