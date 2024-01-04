@@ -2,8 +2,6 @@ add_executable(fuzz_tester fuzz_tester.cpp)
 target_link_libraries(fuzz_tester
     PRIVATE 
 	text_processing
-	project_options
-	project_warnings
 	-coverage
 	-fsanitize=fuzzer,undefined,address,leak
 )
