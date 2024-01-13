@@ -25,14 +25,19 @@ target_sources(text_processing INTERFACE
     include/text_processing/sub.hpp
 )
 target_include_directories(text_processing INTERFACE include)
+include(Packages.cmake)
+add_dependency(
+    NAME googletest
+    PACKAGE GTest
+    URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
+)
+add_dependency(
+    NAME _project_options 
+    URL https://github.com/aminya/project_options/archive/refs/tags/v0.33.0.zip
+)
 
 if(DEVELOPER_BUILD)
-    include(FetchContent)
-    FetchContent_Declare(
-        _project_options
-        URL https://github.com/aminya/project_options/archive/refs/tags/v0.33.0.zip
-    )
-    FetchContent_MakeAvailable(_project_options)
+    use_dependency(_project_options)
 
     set(ENABLE_CPPCHECK "ENABLE_CPPCHECK")
     if(NOT CXX_CPPCHECK)
@@ -110,14 +115,9 @@ if(TEXT_PROCESSING_ENABLE_TESTS)
     include(GoogleTest)
 
     enable_testing()
-    FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG        58d77fa8070e8cec2dc1ed015d66b454c8d78850 # release-1.12.1
-    )
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
+    use_dependency(GTest)
 
     add_executable(main 
         common.cc
