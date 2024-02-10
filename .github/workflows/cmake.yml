@@ -86,4 +86,4 @@ jobs:
         buildPreset: 'ninja-multi-vcpkg'
         buildPresetAdditionalArgs: '[`--config ${{matrix.build_type}}`]'
         testPreset: 'ninja-multi-vcpkg'
-        testPresetAdditionalArgs: '[`--config ${{matrix.build_type}}`, `--build-config ${{matrix.build_type}}`]'
+        testPresetAdditionalArgs: '[`--config ${{matrix.build_type}}`, `-C ${{matrix.build_type}}`]'
