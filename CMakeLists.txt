@@ -129,6 +129,7 @@ if(TEXT_PROCESSING_ENABLE_TESTS)
         replace.cc 
         split.cc 
         sub.cc
+        main.cc
     )
 
     target_link_libraries(main PRIVATE text_processing GTest::gtest GTest::gmock )
