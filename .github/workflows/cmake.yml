@@ -84,6 +84,6 @@ jobs:
         configurePreset: 'ninja-multi-vcpkg'
         configurePresetAdditionalArgs: '[`-DTEXT_PROCESSING_ENABLE_TESTS=ON`, `-DDEVELOPER_BUILD=ON`]'
         buildPreset: 'ninja-multi-vcpkg'
-        buildPresetAdditionalArgs: '[`--config ${{matrix.build_type}}`]'
+        buildPresetAdditionalArgs: '[`--config`, `${{matrix.build_type}}`]'
         testPreset: 'ninja-multi-vcpkg'
         testPresetAdditionalArgs: '[`--config`, `${{matrix.build_type}}`, `-C`, `${{matrix.build_type}}`]'
