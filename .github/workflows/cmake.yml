@@ -13,12 +13,13 @@ on:
     branches:
       - master
       - development
-
+env:
+  vcpkgCommitId: c9919121dde6f61c0436adda94624636e041226b
 jobs:
   build:
     strategy:
       fail-fast: false
-      matrix:
+      matrix:  
         os:
           - ubuntu-22.04
         compiler:
@@ -57,8 +58,14 @@ jobs:
         echo "CC=${{ matrix.compiler.cc }}" >> $GITHUB_ENV
         echo "CXX=${{ matrix.compiler.cxx }}" >> $GITHUB_ENV
 
+    - name: Restore from cache and setup vcpkg executable and data files.
+      uses: lukka/run-vcpkg@v11
+      with:
+        vcpkgJsonGlob: 'vcpkg.json'
+        vcpkgGitCommitId: '${{ env.vcpkgCommitId }}'
+
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/build -G "${{matrix.generator}}" -DCMAKE_BUILD_TYPE:STRING=${{matrix.build_type}} -DTEXT_PROCESSING_ENABLE_TESTS=ON  -DDEVELOPER_BUILD=ON
+      run: cmake -B ${{github.workspace}}/build -G "${{matrix.generator}}" -DCMAKE_BUILD_TYPE:STRING=${{matrix.build_type}} -DTEXT_PROCESSING_ENABLE_TESTS=ON  -DDEVELOPER_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{matrix.build_type}}
