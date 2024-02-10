@@ -129,10 +129,10 @@ if(TEXT_PROCESSING_ENABLE_TESTS)
         replace.cc 
         split.cc 
         sub.cc
-        main.cc
+        # main.cc
     )
 
-    target_link_libraries(main PRIVATE text_processing GTest::gtest GTest::gmock )
+    target_link_libraries(main PRIVATE text_processing GTest::gtest GTest::gmock_main GTest::gtest_main GTest::gmock )
     if(DEVELOPER_BUILD)
         if(TEXT_PROCESSING_ENABLE_FUZZING)
             message(STATUS "Fuzzing enabled")
